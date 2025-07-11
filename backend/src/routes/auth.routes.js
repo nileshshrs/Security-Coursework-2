@@ -7,6 +7,7 @@ import {
   resetPasswordController,
   sendPasswordResetController,
   verifyEmailController,
+  verifyMfaController,
 } from "../controllers/auth.controller.js";
 
 import { validate } from "../middleware/validate.js";
@@ -17,6 +18,7 @@ import {
   passwordResetSchema,
   verifyEmailSchema,
   refreshTokenSchema,
+  mfaCodeSchema,
 } from "../utils/schema.js";
 
 const authRoutes = Router();
@@ -28,5 +30,7 @@ authRoutes.post("/refresh", validate(refreshTokenSchema), refreshController);
 authRoutes.post("/account-recovery", validate(sendPasswordResetSchema), sendPasswordResetController);
 authRoutes.post("/reset-password", validate(passwordResetSchema), resetPasswordController);
 authRoutes.get("/verify-email/:code", validate(verifyEmailSchema, "params"), verifyEmailController);
+authRoutes.post("/verify-mfa", validate(mfaCodeSchema), verifyMfaController);
+
 
 export default authRoutes;

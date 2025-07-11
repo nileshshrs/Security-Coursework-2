@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   bio: { type: String, default: "" },
   password: { type: String, required: true },
   role: { type: String, enum: ["user", "admin"], default: "user" },
-  verified: { type: Boolean, default: false }
+  verified: { type: Boolean, default: false },
+  mfaEnabled: { type: Boolean, default: false },
 }, {
   timestamps: true,
 });

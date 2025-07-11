@@ -43,3 +43,53 @@ export const getVerifyEmailTemplate = ({ username, url }) => ({
 </body>
 </html>`,
 });
+
+
+export const getMfaCodeTemplate = ({ username, code }) => ({
+  subject: "Your MFA Verification Code",
+  text: `Hi ${username || "there"},\n\nYour MFA verification code is: ${code}\n\nEnter this code to complete your login.\n\nIf you did not request this, please ignore this email.`,
+  html: `<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <title>MFA Verification Code</title>
+  <meta name="description" content="MFA Verification Code Email Template.">
+  <style type="text/css">a:hover { text-decoration: underline !important; }</style>
+</head>
+<body style="margin: 0; background-color: #f2f3f8;">
+  <table width="100%" bgcolor="#f2f3f8" style="font-family: 'Open Sans', sans-serif;">
+    <tr><td>
+      <table width="100%" align="center" cellpadding="0" cellspacing="0" style="max-width:670px; margin: 0 auto;">
+        <tr><td style="height:80px;">&nbsp;</td></tr>
+        <tr><td style="text-align:center;"></td></tr>
+        <tr><td style="height:20px;">&nbsp;</td></tr>
+        <tr><td>
+          <table width="95%" align="center" cellpadding="0" cellspacing="0" style="background:#fff; border-radius:3px; text-align:center; box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
+            <tr><td style="height:40px;">&nbsp;</td></tr>
+            <tr><td style="padding:0 35px;">
+              <h1 style="color:#1e1e2d; font-weight:500; font-size:32px;">Your MFA Verification Code</h1>
+              <span style="display:inline-block; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
+              <p style="color:#455056; font-size:15px; line-height:24px;">
+                Hi ${username || "there"},<br><br>
+                Use the following code to complete your login:
+              </p>
+              <div style="font-size:28px; letter-spacing:8px; font-weight:700; color:#2f89ff; margin:30px 0;">
+                ${code}
+              </div>
+              <p style="color:#455056; font-size:14px; line-height:24px; margin-top:32px;">
+                This code will expire in 5 minutes. If you did not request this code, please ignore this email.
+              </p>
+            </td></tr>
+            <tr><td style="height:40px;">&nbsp;</td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="height:20px;">&nbsp;</td></tr>
+        <tr><td style="text-align:center;"><p style="font-size:14px; color:#999;">&copy; Security Coursework App</p></td></tr>
+        <tr><td style="height:80px;">&nbsp;</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+});
+

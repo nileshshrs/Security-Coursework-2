@@ -11,3 +11,5 @@ export const fifteenMinutesFromNow = () => new Date(Date.now() + 15 * 60 * 1000)
 export const fiveMinutesAgo = () => new Date(Date.now() - 5 * 60 * 60 * 1000) // 5 minutes * 60 seconds
 
 export const oneHourFromNow = () => new Date(Date.now() + 60 * 60  * 1000); // 60 minutes * 60
+
+export const fiveMinutesFromNow = () => new Date(Date.now() + 5 * 60 * 1000);

@@ -6,11 +6,12 @@ import {
     refreshUserAccessToken,
     resetPassword,
     sendPasswordResetEmail,
-    verifyEmail
+    verifyEmail,
+    verifyMfaCode
 } from "../service/auth.service.js";
 import appAssert from "../utils/appAssert.js";
 import catchErrors from "../utils/catchErrors.js";
-import { CREATED, OK, UNAUTHORIZED , INTERNAL_SERVER_ERROR} from "../utils/constants/http.js";
+import { CREATED, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } from "../utils/constants/http.js";
 import {
     clearAuthCookies,
     getAccessTokenCookieOptions,
@@ -39,14 +40,24 @@ export const loginController = catchErrors(async (req, res) => {
         userAgent: req.headers["user-agent"],
     };
 
-    const { user, accessToken, refreshToken } = await login(request);
+    const result = await login(request);
 
-    return setAuthCookies(res, accessToken, refreshToken).status(OK).json({
+    if (result.requiresMFA) {
+        // Don't set cookies, don't log user in, just prompt for MFA code
+        return res.status(200).json({
+            message: result.message,
+            requiresMFA: true,
+            userID: result.userID,
+        });
+    }
+
+    // Only here if login succeeded and no MFA is required
+    setAuthCookies(res, result.accessToken, result.refreshToken);
+    return res.status(OK).json({
         message: "successfully logged in.",
-        user,
+        user: result.user,
     });
 });
-
 export const logoutController = catchErrors(async (req, res) => {
     const accessToken = req.cookies.access_token;
     const { payload } = verifyAccessToken(accessToken || "");
@@ -98,12 +109,25 @@ export const resetPasswordController = catchErrors(async (req, res) => {
 
 
 export const verifyEmailController = catchErrors(
-  async (req, res) => {
-    const verificationCode = req.params.code;
-    await verifyEmail(verificationCode);
+    async (req, res) => {
+        const verificationCode = req.params.code;
+        await verifyEmail(verificationCode);
 
-    return res.status(OK).json({
-      message: "Email verification successful."
-    });
-  }
+        return res.status(OK).json({
+            message: "Email verification successful."
+        });
+    }
 );
+
+export const verifyMfaController = catchErrors(async (req, res) => {
+    const { code } = req.body;
+    const userAgent = req.headers["user-agent"];
+
+    const { accessToken, refreshToken, user } = await verifyMfaCode({ code, userAgent });
+
+    setAuthCookies(res, accessToken, refreshToken);
+    return res.status(OK).json({
+        message: "MFA verification successful.",
+        user,
+    });
+});
