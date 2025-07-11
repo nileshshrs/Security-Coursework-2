@@ -5,15 +5,14 @@ import cookieParser from 'cookie-parser';
 import fs from 'fs';
 import https from 'https';
 import { PORT } from './utils/constants/env.js';
-import connect from './database/connect.js';
-import error from './middleware/error.js';
+// import connect from './database/connect.js';
+// import error from './middleware/error.js';
 
 // Load SSL certificate and key
 const sslOptions = {
-    key: fs.readFileSync('./server.key'),
-    cert: fs.readFileSync('./server.cert')
+  key: fs.readFileSync('../server.key'),
+  cert: fs.readFileSync('../server.cert')
 };
-
 // Create Express app
 const app = express();
 
@@ -31,7 +30,7 @@ app.use(cookieParser());
 // (Route handlers temporarily removed)
 
 // Error handler
-app.use(error);
+// app.use(error);
 
 // Create HTTPS server
 const server = https.createServer(sslOptions, app);
