@@ -1,0 +1,50 @@
+# Node modules
+**/node_modules/
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime
+**/pids/
+**/*.pid
+**/*.seed
+**/*.pid.lock
+
+# dotenv environment variables
+# **/.env
+# **/.env.local
+# **/.env.*.local
+
+# Optional npm cache directory
+**/.npm/
+
+# Build output (React, Vite, etc.)
+frontend/build/
+frontend/dist/
+
+# Coverage reports
+**/coverage/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+
+# React cache
+frontend/.parcel-cache/
+frontend/.next/
+frontend/.turbo/
+
+# MongoDB dump (optional)
+**/dump/
+server.key
+server.cert
+cert/
+*.pem
