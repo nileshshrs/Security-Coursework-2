@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import DOMPurify from "dompurify";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
-  const [fields, setFields] = useState({ email: "", password: "" });
+  const [fields, setFields] = useState({ usernameOrEmail: "", password: "" });
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFields(prev => ({
@@ -16,15 +19,20 @@ const Login = () => {
     }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Sanitize input fields before using/sending
-    const sanitizedData = {
-      email: DOMPurify.sanitize(fields.email),
-      password: DOMPurify.sanitize(fields.password),
-    };
-    // Replace this alert with your login API logic
+    setFormError("");
 
+    try {
+      await login({
+        usernameOrEmail: fields.usernameOrEmail,
+        password: fields.password,
+      });
+      navigate("/");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setFormError(err?.message || "Login failed");
+    }
   }
 
   return (
@@ -34,25 +42,30 @@ const Login = () => {
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-gray-900">
             Sign in
           </h2>
-          <p className="mb-7 text-gray-500 text-base">
+          <p className="mb-4 text-gray-500 text-base">
             Enter your email or username and password to access your account
           </p>
+
+          {formError && (
+            <p className="text-red-500 text-sm mb-4 font-bold">{formError}</p>
+          )}
+
           <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
             <div>
               <Label
-                htmlFor="email"
+                htmlFor="usernameOrEmail"
                 className="font-semibold text-gray-700 mb-2 block text-base"
               >
                 Username or Email*
               </Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
+                id="usernameOrEmail"
+                name="usernameOrEmail"
+                type="text"
                 autoComplete="off"
-                placeholder="you@example.com"
+                placeholder="username or you@example.com"
                 className="bg-[#f6f6f8] border border-gray-200 rounded-sm text-base"
-                value={fields.email}
+                value={fields.usernameOrEmail}
                 onChange={handleChange}
                 required
               />

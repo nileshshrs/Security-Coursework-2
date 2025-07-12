@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext"; // adjust path if needed
+import { useAuth } from "@/context/AuthContext";
 
 const USER_REGEX = /^[a-zA-Z0-9-_]{4,24}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,24}$/;
@@ -42,8 +42,10 @@ function getPasswordStrength(pwd: string) {
 }
 
 const Register = () => {
-  const { register: registerUser } = useAuth(); // get register function from AuthContext
+  const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
   const [passwordValue, setPasswordValue] = useState("");
+  const [formError, setFormError] = useState("");
 
   const {
     register,
@@ -56,14 +58,17 @@ const Register = () => {
   });
 
   const onSubmit = async (data: RegisterValues) => {
+    setFormError("");
     try {
       await registerUser({
         email: data.email,
         username: data.name,
         password: data.password,
       });
-    } catch (err) {
+      navigate("/")
+    } catch (err: any) {
       console.error("Registration error:", err);
+      setFormError(err?.message || "Something went wrong");
     }
   };
 
@@ -78,13 +83,18 @@ const Register = () => {
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-gray-900">
             Sign up
           </h2>
-          <p className="mb-7 text-gray-500 text-base">
+          <p className="mb-3 text-gray-500 text-base">
             Create your account to start shopping
           </p>
+
+          {formError && (
+            <div className="mb-4 text-red-600 text-sm font-medium">{formError}</div>
+          )}
+
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div>
               <Label htmlFor="name" className="font-semibold text-gray-700 mb-2 block text-base">
-                Name
+                Username*
               </Label>
               <Input
                 id="name"
@@ -101,7 +111,7 @@ const Register = () => {
             </div>
             <div>
               <Label htmlFor="email" className="font-semibold text-gray-700 mb-2 block text-base">
-                Email
+                Email*
               </Label>
               <Input
                 id="email"
@@ -118,7 +128,7 @@ const Register = () => {
             </div>
             <div>
               <Label htmlFor="password" className="font-semibold text-gray-700 mb-2 block text-base">
-                Password
+                Password*
               </Label>
               <Input
                 id="password"
@@ -169,6 +179,7 @@ const Register = () => {
                 <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>
               )}
             </div>
+
             <Button
               type="submit"
               className="w-full rounded-sm font-semibold py-2 text-base bg-black text-white hover:bg-gray-800 transition"
