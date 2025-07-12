@@ -5,7 +5,7 @@ import { clearAuthCookies, refresh_path } from "../utils/cookies.js";
 const handleAppError = (res, error) => {
   return res.status(error.statusCode).json({
     message: error.message,
-    errorCode: error.errorCode || undefined,
+    errorCode: error.errorCode || null,
   });
 };
 
@@ -19,7 +19,6 @@ const error = (err, req, res, next) => {
       return handleAppError(res, err);
     }
 
-    // fallback for unhandled runtime errors
     console.error(`Unhandled Error @ ${req.path}:`, err);
     return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
   } catch (handlerError) {

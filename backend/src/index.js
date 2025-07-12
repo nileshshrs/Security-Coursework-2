@@ -8,12 +8,19 @@ import { PORT } from './utils/constants/env.js';
 import connect from './database/connect.js';
 import error from './middleware/error.js';
 import authRoutes from './routes/auth.routes.js';
+import path from "path"; // ← You are missing this
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load SSL certificate and key
 const sslOptions = {
-  key: fs.readFileSync('../server.key'),
-  cert: fs.readFileSync('../server.cert')
+  key: fs.readFileSync(path.resolve(__dirname, '../../localhost+2-key.pem')),
+  cert: fs.readFileSync(path.resolve(__dirname, '../../localhost+2.pem')),
 };
+
 // Create Express app
 const app = express();
 
@@ -21,7 +28,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

@@ -1,23 +1,23 @@
-import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import DOMPurify from "dompurify";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext"; // adjust path if needed
 
 const USER_REGEX = /^[a-zA-Z0-9-_]{4,24}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,24}$/;
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,24}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const registerSchema = z.object({
   name: z
     .string()
     .min(4, "Username must be at least 4 characters")
-    .max(24, "Username must be at most 24 characters")
+    .max(64, "Username must be at most 64 characters")
     .regex(USER_REGEX, "Username can only contain letters, numbers, - or _"),
   email: z.string().regex(EMAIL_REGEX, "Invalid email address"),
   password: z
@@ -42,7 +42,9 @@ function getPasswordStrength(pwd: string) {
 }
 
 const Register = () => {
+  const { register: registerUser } = useAuth(); // get register function from AuthContext
   const [passwordValue, setPasswordValue] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -53,16 +55,17 @@ const Register = () => {
     reValidateMode: "onChange",
   });
 
-  function onSubmit(data: RegisterValues) {
-    // Sanitize all fields before using/sending
-    const sanitizedData = {
-      name: DOMPurify.sanitize(data.name),
-      email: DOMPurify.sanitize(data.email),
-      password: DOMPurify.sanitize(data.password),
-    };
-    // Replace this alert with your API call
-    alert(JSON.stringify(sanitizedData, null, 2));
-  }
+  const onSubmit = async (data: RegisterValues) => {
+    try {
+      await registerUser({
+        email: data.email,
+        username: data.name,
+        password: data.password,
+      });
+    } catch (err) {
+      console.error("Registration error:", err);
+    }
+  };
 
   const meter = getPasswordStrength(passwordValue);
   const meterColors = ["bg-red-500", "bg-yellow-500", "bg-green-600"];
@@ -80,10 +83,7 @@ const Register = () => {
           </p>
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div>
-              <Label
-                htmlFor="name"
-                className="font-semibold text-gray-700 mb-2 block text-base"
-              >
+              <Label htmlFor="name" className="font-semibold text-gray-700 mb-2 block text-base">
                 Name
               </Label>
               <Input
@@ -100,10 +100,7 @@ const Register = () => {
               )}
             </div>
             <div>
-              <Label
-                htmlFor="email"
-                className="font-semibold text-gray-700 mb-2 block text-base"
-              >
+              <Label htmlFor="email" className="font-semibold text-gray-700 mb-2 block text-base">
                 Email
               </Label>
               <Input
@@ -120,10 +117,7 @@ const Register = () => {
               )}
             </div>
             <div>
-              <Label
-                htmlFor="password"
-                className="font-semibold text-gray-700 mb-2 block text-base"
-              >
+              <Label htmlFor="password" className="font-semibold text-gray-700 mb-2 block text-base">
                 Password
               </Label>
               <Input
@@ -133,7 +127,7 @@ const Register = () => {
                 className="bg-[#f6f6f8] border border-gray-200 rounded-sm text-base"
                 autoComplete="off"
                 {...register("password")}
-                onChange={e => {
+                onChange={(e) => {
                   register("password").onChange(e);
                   setPasswordValue(e.target.value);
                 }}
