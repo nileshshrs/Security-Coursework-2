@@ -40,7 +40,7 @@ export default function DashboardUsers() {
               <div className="flex justify-end">Action</div>
             </div>
             {/* Table Body */}
-            <ScrollArea className="h-[350px] w-full px-0">
+            <ScrollArea className="h-[650px] w-full px-0">
               <div>
                 {users.length > 0 ? (
                   users.map((user, idx) => (

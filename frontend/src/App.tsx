@@ -8,7 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import SingleProduct from "./pages/SingleProduct";
 import DashboardOverview from "./components/dashboard/DashboardOverview";
 import DashboardClothes from "./components/dashboard/DashboardClothes";
-import DashboardUsers from "./components/dashboard/DashboardUsers"; // <-- Import
+import DashboardUsers from "./components/dashboard/DashboardUsers";
+import DashboardOrders from "./components/dashboard/DashboardOrders"; // <-- Import
 
 function App() {
   const location = useLocation();
@@ -24,7 +25,8 @@ function App() {
           {/* Dashboard nested routes (rendered in <Outlet />) */}
           <Route index element={<DashboardOverview />} />
           <Route path="clothes" element={<DashboardClothes />} />
-          <Route path="users" element={<DashboardUsers />} /> {/* /dashboard/users */}
+          <Route path="users" element={<DashboardUsers />} />
+          <Route path="orders" element={<DashboardOrders />} /> {/* /dashboard/orders */}
         </Route>
         <Route path="/:id" element={<SingleProduct />} />
         <Route path="/all" element={<ProductPage />} />
