@@ -10,14 +10,13 @@ const Dashboard = () => {
       {/* Sidebar */}
       <Sidebar open={sidebarOpen} slide={() => setSidebarOpen(false)} />
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full max-w-full">
         {/* Header Row */}
         <div
           className="
             flex items-center justify-between gap-1 mb-4 min-w-0
             px-2 py-2
             sm:gap-2 sm:mb-6 sm:px-4
-            overflow-x-auto
           "
         >
           {/* Hamburger */}
@@ -55,8 +54,8 @@ const Dashboard = () => {
             Add Clothes
           </button>
         </div>
-        {/* Browser scrolls whole page. No overflow-y-auto here! */}
-        <div className="px-2 sm:px-4 pb-4">
+        {/* --- THE FIX: Outlet is in a wrapper with w-full max-w-full --- */}
+        <div className="w-full max-w-full px-2 sm:px-4 pb-4">
           <Outlet />
         </div>
       </div>

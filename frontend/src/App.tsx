@@ -7,7 +7,8 @@ import ProductPage from "./pages/Product";
 import Dashboard from "./pages/Dashboard";
 import SingleProduct from "./pages/SingleProduct";
 import DashboardOverview from "./components/dashboard/DashboardOverview";
-import DashboardClothes from "./components/dashboard/DashboardClothes"; // <-- Import
+import DashboardClothes from "./components/dashboard/DashboardClothes";
+import DashboardUsers from "./components/dashboard/DashboardUsers"; // <-- Import
 
 function App() {
   const location = useLocation();
@@ -20,10 +21,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard/*" element={<Dashboard />}>
-          {/* These routes render inside Dashboard's <Outlet /> */}
-          <Route index element={<DashboardOverview />} /> {/* /dashboard main overview */}
-          <Route path="clothes" element={<DashboardClothes />} /> {/* /dashboard/clothes */}
-          {/* Add more dashboard subpages here if needed */}
+          {/* Dashboard nested routes (rendered in <Outlet />) */}
+          <Route index element={<DashboardOverview />} />
+          <Route path="clothes" element={<DashboardClothes />} />
+          <Route path="users" element={<DashboardUsers />} /> {/* /dashboard/users */}
         </Route>
         <Route path="/:id" element={<SingleProduct />} />
         <Route path="/all" element={<ProductPage />} />
