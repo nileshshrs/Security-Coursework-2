@@ -10,6 +10,8 @@ import DashboardOverview from "./components/dashboard/DashboardOverview";
 import DashboardClothes from "./components/dashboard/DashboardClothes";
 import DashboardUsers from "./components/dashboard/DashboardUsers";
 import DashboardOrders from "./components/dashboard/DashboardOrders"; // <-- Import
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const location = useLocation();
@@ -28,10 +30,12 @@ function App() {
           <Route path="users" element={<DashboardUsers />} />
           <Route path="orders" element={<DashboardOrders />} /> {/* /dashboard/orders */}
         </Route>
-        <Route path="/:id" element={<SingleProduct />} />
-        <Route path="/all" element={<ProductPage />} />
+        <Route path="/clothes/:id" element={<SingleProduct />} />
+        <Route path="/clothes/all" element={<ProductPage />} />
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
+        <Route path="/account-recovery" element={<ForgotPassword />} />
+         <Route path="/password/reset" element={<ResetPassword />} />
       </Routes>
     </>
   );

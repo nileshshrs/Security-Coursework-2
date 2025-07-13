@@ -87,6 +87,15 @@ const Login = () => {
                 onChange={handleChange}
                 required
               />
+              {/* Forgot Password Link */}
+              <div className="text-right mt-2">
+                <Link
+                  to="/account-recovery"
+                  className="text-sm text-black font-medium underline hover:text-gray-800 transition"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
             <Button
               type="submit"
