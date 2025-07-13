@@ -4,10 +4,10 @@ import Register from "./pages/Register";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import ProductPage from "./pages/Product";
-import Dashboard from "./pages/Dashboard"; // This is your layout with sidebar + <Outlet />
+import Dashboard from "./pages/Dashboard";
 import SingleProduct from "./pages/SingleProduct";
 import DashboardOverview from "./components/dashboard/DashboardOverview";
-// import ClothesPage, UsersPage, OrdersPage etc as needed
+import DashboardClothes from "./components/dashboard/DashboardClothes"; // <-- Import
 
 function App() {
   const location = useLocation();
@@ -20,12 +20,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard/*" element={<Dashboard />}>
-          {/* The below routes render inside Dashboard's <Outlet /> */}
+          {/* These routes render inside Dashboard's <Outlet /> */}
           <Route index element={<DashboardOverview />} /> {/* /dashboard main overview */}
-          {/* More dashboard subpages can go here: */}
-          {/* <Route path="clothes" element={<ClothesPage />} /> */}
-          {/* <Route path="users" element={<UsersPage />} /> */}
-          {/* <Route path="orders" element={<OrdersPage />} /> */}
+          <Route path="clothes" element={<DashboardClothes />} /> {/* /dashboard/clothes */}
+          {/* Add more dashboard subpages here if needed */}
         </Route>
         <Route path="/:id" element={<SingleProduct />} />
         <Route path="/all" element={<ProductPage />} />

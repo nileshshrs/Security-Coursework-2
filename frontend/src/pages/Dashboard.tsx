@@ -11,33 +11,52 @@ const Dashboard = () => {
       <Sidebar open={sidebarOpen} slide={() => setSidebarOpen(false)} />
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header Row: Hamburger + Heading + Add Clothes */}
-        <div className="flex items-center justify-between gap-2 mb-6 min-w-0 p-4">
-          {/* Hamburger for mobile/tablet */}
+        {/* Header Row */}
+        <div
+          className="
+            flex items-center justify-between gap-1 mb-4 min-w-0
+            px-2 py-2
+            sm:gap-2 sm:mb-6 sm:px-4
+            overflow-x-auto
+          "
+        >
+          {/* Hamburger */}
           <button
-            className="md:hidden flex-shrink-0 p-2 text-2xl bg-white rounded"
+            className="md:hidden flex-shrink-0 p-2 text-lg sm:text-2xl bg-white rounded"
             onClick={() => setSidebarOpen(true)}
             aria-label="Open Sidebar"
             style={{ border: "none" }}
           >
-            <span className="block w-6 h-0.5 bg-black mb-1"></span>
-            <span className="block w-6 h-0.5 bg-black mb-1"></span>
-            <span className="block w-6 h-0.5 bg-black"></span>
+            <span className="block w-5 h-0.5 bg-black mb-1"></span>
+            <span className="block w-5 h-0.5 bg-black mb-1"></span>
+            <span className="block w-5 h-0.5 bg-black"></span>
           </button>
           {/* Heading */}
-          <h1 className="flex-1 text-lg sm:text-xl md:text-2xl font-bold text-center md:text-left truncate mx-2">
+          <h1
+            className="
+              flex-1 text-base sm:text-lg md:text-2xl font-bold
+              text-center md:text-left truncate mx-1 sm:mx-2
+            "
+            style={{ minWidth: 0 }}
+          >
             Welcome to Dashboard
           </h1>
           <button
             type="button"
-            className="flex-shrink-0 bg-black text-white px-2 sm:px-4 py-2 rounded font-semibold text-xs sm:text-sm md:text-base hover:bg-gray-900 transition-colors"
-            style={{ minWidth: "90px" }}
+            className="
+              flex-shrink-0 bg-black text-white
+              px-2 sm:px-4 py-2 rounded font-semibold
+              text-xs sm:text-sm md:text-base
+              hover:bg-gray-900 transition-colors
+              ml-1
+            "
+            style={{ minWidth: "80px" }}
           >
             Add Clothes
           </button>
         </div>
         {/* Browser scrolls whole page. No overflow-y-auto here! */}
-        <div className="px-4 pb-4">
+        <div className="px-2 sm:px-4 pb-4">
           <Outlet />
         </div>
       </div>
