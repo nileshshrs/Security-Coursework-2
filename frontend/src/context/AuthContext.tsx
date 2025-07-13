@@ -2,10 +2,18 @@ import React, { createContext, useContext, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import API from "@/api/apiClient";
-import type { AuthContextType, LoginRequest, LoginResponse, User } from "@/utils/types";
+import type { AuthContextType, LoginRequest, User } from "@/utils/types";
 
+type MfaState = {
+  requiresMFA: boolean;
+  userID: string;
+  message: string;
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType & {
+  mfa: MfaState | null;
+  verifyMfa: (payload: { code: string }) => Promise<void>;
+} | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -16,26 +24,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     }
   });
+  const [mfa, setMfa] = useState<MfaState | null>(null);
 
   const navigate = useNavigate();
 
-  // LOGIN
+  // LOGIN (may require MFA)
   const loginMutation = useMutation({
     mutationFn: async (data: LoginRequest) => {
-      const res: LoginResponse = await API.post("/auth/sign-in", data);
+      const res: any = await API.post("/auth/sign-in", data);
+      // No .data -- just res
+      if (res.requiresMFA) {
+        setMfa({ requiresMFA: true, userID: res.userID, message: res.message });
+        return null; // Don't set user
+      }
+      return res.user; // Only if login is successful (for normal logins)
+    },
+    onSuccess: (user: User | null) => {
+      if (!user) return; // Handled by MFA flow
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      setMfa(null); // Clean up any pending MFA
+    },
+  });
+
+
+  // MFA CODE VERIFICATION
+  const verifyMfaMutation = useMutation({
+    mutationFn: async ({ code }: { code: string }) => {
+      const res: any = await API.post("/auth/verify-mfa", { code });
+ 
       return res.user;
     },
     onSuccess: (user: User) => {
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
+      setMfa(null);
     },
   });
 
   // REGISTER
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; username: string; password: string }) => {
-      const res = await API.post("/auth/sign-up", data) as { user: User; message: string };
-      return res;
+      const res = await API.post("/auth/sign-up", data) as { data: { user: User; message: string } };
+      return res.data;
     },
     onSuccess: (res) => {
       setUser(res.user);
@@ -52,6 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     onSuccess: () => {
       localStorage.removeItem("user");
       setUser(null);
+      setMfa(null);
       navigate("/sign-in", { replace: true });
       window.location.reload();
     },
@@ -60,7 +92,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   });
 
-  const value: AuthContextType = {
+  const value: AuthContextType & {
+    mfa: MfaState | null;
+    verifyMfa: (payload: { code: string }) => Promise<void>;
+  } = {
     user,
     login: async (data: LoginRequest) => {
       await loginMutation.mutateAsync(data);
@@ -71,6 +106,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     isAuthenticated: !!user,
     setUser,
+    mfa,
+    verifyMfa: async ({ code }) => {
+      await verifyMfaMutation.mutateAsync({ code });
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

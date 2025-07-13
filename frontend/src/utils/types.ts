@@ -23,10 +23,12 @@ export type LoginResponse = {
 
 // --- AuthContext Shape ---
 export type AuthContextType = {
-    user: User | null;
-    login: (data: LoginRequest) => Promise<void>;
-    register: (data: { email: string; username: string; password: string }) => Promise<void>; // ADD THIS
-    logout: () => void;
-    isAuthenticated: boolean;
-    setUser: (user: User | null) => void;
+  user: User | null;
+  login: (data: LoginRequest) => Promise<void>;
+  register: (data: { email: string; username: string; password: string }) => Promise<void>;
+  logout: () => void;
+  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  mfa: { requiresMFA: boolean; userID: string; message: string } | null;
+  verifyMfa: (data: { code: string }) => Promise<void>;
 };

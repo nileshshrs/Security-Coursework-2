@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,11 @@ import { useAuth } from "@/context/AuthContext";
 const Login = () => {
   const [fields, setFields] = useState({ usernameOrEmail: "", password: "" });
   const [formError, setFormError] = useState("");
+  const { login, mfa } = useAuth();
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFields(prev => ({
+    setFields((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -22,18 +22,26 @@ const Login = () => {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
-
     try {
       await login({
         usernameOrEmail: fields.usernameOrEmail,
         password: fields.password,
       });
-      navigate("/");
+      // Don't redirect here! Let useEffect below handle
     } catch (err: any) {
-      console.error("Login error:", err);
       setFormError(err?.message || "Login failed");
     }
   }
+
+  // Redirect to MFA page if MFA is required
+  useEffect(() => {
+    if (mfa && mfa.requiresMFA) {
+      navigate("/verify-mfa", { replace: true });
+    } else if (mfa === null && localStorage.getItem("user")) {
+      // On successful login without MFA, user is set and mfa is null
+      navigate("/");
+    }
+  }, [mfa, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6] px-4">
@@ -45,11 +53,9 @@ const Login = () => {
           <p className="mb-4 text-gray-500 text-base">
             Enter your email or username and password to access your account
           </p>
-
           {formError && (
             <p className="text-red-500 text-sm mb-4 font-bold">{formError}</p>
           )}
-
           <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
             <div>
               <Label
@@ -87,15 +93,6 @@ const Login = () => {
                 onChange={handleChange}
                 required
               />
-              {/* Forgot Password Link */}
-              <div className="text-right mt-2">
-                <Link
-                  to="/account-recovery"
-                  className="text-sm text-black font-medium underline hover:text-gray-800 transition"
-                >
-                  Forgot password?
-                </Link>
-              </div>
             </div>
             <Button
               type="submit"
@@ -111,6 +108,14 @@ const Login = () => {
               className="ml-2 text-black font-medium underline hover:text-gray-800 transition text-base"
             >
               Sign up
+            </Link>
+          </div>
+          <div className="mt-4 text-center">
+            <Link
+              to="/account-recovery"
+              className="text-gray-600 underline hover:text-black text-sm"
+            >
+              Forgot password?
             </Link>
           </div>
         </CardContent>

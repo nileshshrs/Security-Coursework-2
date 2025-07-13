@@ -12,6 +12,7 @@ import DashboardUsers from "./components/dashboard/DashboardUsers";
 import DashboardOrders from "./components/dashboard/DashboardOrders"; // <-- Import
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import MfaPage from "./pages/MfaPage";
 
 function App() {
   const location = useLocation();
@@ -35,7 +36,8 @@ function App() {
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
         <Route path="/account-recovery" element={<ForgotPassword />} />
-         <Route path="/password/reset" element={<ResetPassword />} />
+        <Route path="/verify-mfa" element={<MfaPage />} />
+        <Route path="/password/reset" element={<ResetPassword />} />
       </Routes>
     </>
   );
