@@ -40,7 +40,7 @@ const clothesSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
-    isNew: { // Use 'isNew' instead of 'new'
+    newArrival: { // changed from isNew
         type: Boolean,
         required: true,
         default: false,
