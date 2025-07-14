@@ -12,6 +12,7 @@ import path from "path"; // ← You are missing this
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import clothesRoutes from './routes/clothes.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,6 +39,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes)
 app.use("/api/v1/clothes", clothesRoutes)
+app.use("/api/v1/upload", uploadRoutes) 
 // Error handler
 app.use(error);
 
