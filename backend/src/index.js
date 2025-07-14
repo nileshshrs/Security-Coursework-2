@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.routes.js';
 import path from "path"; // ← You are missing this
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import clothesRoutes from './routes/clothes.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,7 +37,7 @@ app.use(cors({
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes)
-
+app.use("/api/v1/clothes", clothesRoutes)
 // Error handler
 app.use(error);
 
