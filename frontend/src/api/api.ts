@@ -89,3 +89,86 @@ export const getClothesById = async (id: string): Promise<any> => {
     throw error;
   }
 };
+
+
+/**
+ * Get current user's cart
+ * GET /api/cart
+ */
+export const getCart = async (): Promise<any> => {
+  try {
+    const res = await API.get("/cart/get");
+    return res; // returns { cart }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Add item to cart
+ * POST /api/cart/add
+ */
+export const addToCart = async ({
+  itemID,
+  quantity = 1,
+  size,
+  color,
+}: {
+  itemID: string;
+  quantity?: number;
+  size: string;
+  color: string;
+}): Promise<any> => {
+  try {
+    const res = await API.post("/cart/add", {
+      itemID,
+      quantity,
+      size,
+      color,
+    });
+    return res; // returns { message, cart }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update existing item in cart (quantity/size/color)
+ * PATCH /api/cart/update
+ */
+export const updateCartItem = async ({
+  itemID,
+  quantity,
+  size,
+  color,
+}: {
+  itemID: string;
+  quantity?: number;
+  size?: string;
+  color?: string;
+}): Promise<any> => {
+  try {
+    const res = await API.patch("/cart/update", {
+      itemID,
+      quantity,
+      size,
+      color,
+    });
+    return res; // returns { message, cart }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Remove item from cart
+ * DELETE /api/cart/remove/:itemID
+ */
+export const removeCartItem = async (itemID: string): Promise<any> => {
+  try {
+    const res = await API.delete(`/cart/remove/${itemID}`);
+    return res; // returns { message, cart }
+  } catch (error) {
+    throw error;
+  }
+};

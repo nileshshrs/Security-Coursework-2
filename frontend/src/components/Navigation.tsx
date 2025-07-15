@@ -4,10 +4,13 @@ import { useAuth } from "@/context/AuthContext";
 import UserDropdown from "./UserDropdown";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Minus, Plus, Trash, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/useCart";
+import type { Cart, CartItem } from "@/utils/types";
+
 
 const navItems = [
   { name: "Home", to: "/" },
@@ -23,6 +26,18 @@ export default function Navigation() {
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
+  const {
+    cart,
+    updateItem,
+    removeItem,
+    isLoading: cartLoading,
+  } = useCart() as {
+    cart: Cart | null;
+    updateItem: any;
+    removeItem: any;
+    isLoading: boolean;
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 100);
@@ -30,6 +45,44 @@ export default function Navigation() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Subtotal calculation (robust)
+  const subtotal =
+    cart?.items?.reduce((sum, { item, quantity }) => {
+      let priceNum = 0;
+      if (typeof item?.price === "object" && "$numberDecimal" in item.price) {
+        priceNum = Number(item.price.$numberDecimal);
+      } else if (typeof item?.price === "string" && !isNaN(Number(item.price))) {
+        priceNum = Number(item.price);
+      } else if (typeof item?.price === "number") {
+        priceNum = item.price;
+      }
+      return sum + priceNum * (quantity ?? 1);
+    }, 0) ?? 0;
+
+  // Handle quantity update
+  const handleUpdateQuantity = (
+    cartItem: CartItem,
+    newQuantity: number
+  ) => {
+    if (newQuantity < 1) return;
+    updateItem.mutate(
+      {
+        itemID: cartItem.item._id,
+        quantity: newQuantity,
+        size: cartItem.size,
+        color: cartItem.color,
+      },
+    
+    );
+  };
+
+  // Handle item removal
+  const handleRemove = (cartItem: CartItem) => {
+    removeItem.mutate(cartItem.item._id, {
+
+    });
+  };
 
   return (
     <nav
@@ -63,11 +116,10 @@ export default function Navigation() {
                 >
                   <span>{item.name}</span>
                   <span
-                    className={`block h-[2px] bg-black rounded-full mt-1 w-7 transition-transform duration-300 origin-center ${
-                      isActive
+                    className={`block h-[2px] bg-black rounded-full mt-1 w-7 transition-transform duration-300 origin-center ${isActive
                         ? "scale-x-100"
                         : "scale-x-0 group-hover:scale-x-100"
-                    }`}
+                      }`}
                   />
                 </span>
               )}
@@ -103,7 +155,7 @@ export default function Navigation() {
                 }}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black text-xs"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -159,7 +211,7 @@ export default function Navigation() {
                   />
                 </svg>
                 <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                  3
+                  {cart?.items?.length || 0}
                 </span>
               </Button>
             </SheetTrigger>
@@ -174,16 +226,71 @@ export default function Navigation() {
 
                 <ScrollArea className="h-full pr-2">
                   <div className="flex flex-col gap-5 pb-4">
-                    {[1, 2, 3, 4, 5].map((id) => (
-                      <div key={id} className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gray-200 rounded-md" />
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm">Product #{id}</p>
-                          <p className="text-xs text-gray-500">Size: M</p>
+                    {cartLoading ? (
+                      <p className="text-gray-500 text-center py-10">Loading...</p>
+                    ) : cart?.items && cart.items.length > 0 ? (
+                      cart.items.map((cartItem: CartItem, idx: number) => (
+                        <div key={cartItem.item?._id || idx} className="flex items-center gap-4">
+                          <img
+                            src={cartItem.item?.imagePath}
+                            alt={cartItem.item?.name}
+                            className="w-16 h-16 object-cover rounded-md bg-gray-100"
+                            onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/64x64?text=No+Image"; }}
+                            draggable={false}
+                          />
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm truncate">{cartItem.item?.name}</p>
+                            <p className="text-xs text-gray-500">
+                              Size: {cartItem.size} | Color: {cartItem.color}
+                            </p>
+                            <div className="flex items-center mt-1 gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="w-7 h-7"
+                                disabled={cartItem.quantity <= 1 || updateItem.isPending}
+                                onClick={() =>
+                                  handleUpdateQuantity(cartItem, cartItem.quantity - 1)
+                                }
+                                aria-label="Decrease"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              <span className="text-base font-bold w-6 text-center select-none">{cartItem.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="w-7 h-7"
+                                disabled={updateItem.isPending}
+                                onClick={() =>
+                                  handleUpdateQuantity(cartItem, cartItem.quantity + 1)
+                                }
+                                aria-label="Increase"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-7 h-7 ml-2 text-red-600"
+                                onClick={() => handleRemove(cartItem)}
+                                disabled={removeItem.isPending}
+                                aria-label="Remove"
+                              >
+                                <Trash className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="font-semibold text-sm">
+                            {typeof cartItem.item?.price === "object" && cartItem.item.price.$numberDecimal
+                              ? "₨ " + Number(cartItem.item.price.$numberDecimal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                              : "₨ " + Number(cartItem.item?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
                         </div>
-                        <p className="font-semibold text-sm">$25</p>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-10">Your cart is empty.</p>
+                    )}
                   </div>
                 </ScrollArea>
               </div>
@@ -191,7 +298,9 @@ export default function Navigation() {
               <div className="mt-4 border-t pt-4 pb-6">
                 <div className="flex justify-between mb-4">
                   <span className="text-sm font-medium text-gray-600">Subtotal</span>
-                  <span className="text-sm font-bold">$200</span>
+                  <span className="text-sm font-bold">
+                    ₨ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
                 </div>
                 <Button className="w-full uppercase font-semibold text-sm">
                   Checkout
@@ -246,8 +355,7 @@ export default function Navigation() {
                     key={item.name}
                     to={item.to}
                     className={({ isActive }) =>
-                      `text-[15px] font-semibold uppercase font-mono tracking-wide ${
-                        isActive ? "text-black" : "text-gray-600"
+                      `text-[15px] font-semibold uppercase font-mono tracking-wide ${isActive ? "text-black" : "text-gray-600"
                       } hover:text-black transition-colors`
                     }
                   >

@@ -1,0 +1,44 @@
+import { addItemToCart, getOrCreateCart, patchCartItem, removeCartItem } from "../service/cart.service.js";
+import catchErrors from "../utils/catchErrors.js";
+import { OK } from "../utils/constants/http.js";
+
+
+export const getCartController = catchErrors(async (req, res) => {
+  const cart = await getOrCreateCart(req.userID);
+  await cart.populate("items.item");
+  return res.status(OK).json({ cart });
+});
+
+export const addToCartController = catchErrors(async (req, res) => {
+  const { itemID, quantity = 1, size, color } = req.body;
+  const cart = await addItemToCart({
+    userID: req.userID,
+    itemID,
+    quantity,
+    size,
+    color,
+  });
+  await cart.populate("items.item");
+  return res.status(OK).json({ message: "Item added to cart", cart });
+});
+
+export const updateCartController = catchErrors(async (req, res) => {
+  const { itemID, quantity} = req.body;
+  const cart = await patchCartItem({
+    userID: req.userID,
+    itemID,
+    quantity,
+  });
+  await cart.populate("items.item");
+  return res.status(OK).json({ message: "Cart item updated", cart });
+});
+
+export const removeCartItemController = catchErrors(async (req, res) => {
+  const { itemID } = req.params;
+  const cart = await removeCartItem({
+    userID: req.userID,
+    itemID,
+  });
+  await cart.populate("items.item");
+  return res.status(OK).json({ message: "Item removed from cart", cart });
+});

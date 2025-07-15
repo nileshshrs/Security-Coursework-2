@@ -51,3 +51,28 @@ export type Clothes = {
   updatedAt?: string;    // ISO string
   __v?: number;
 };
+
+
+export type CartClothingItem = {
+  _id: string;
+  name: string;
+  price: { $numberDecimal: string } | number;
+  imagePath?: string;
+  [key: string]: any; // To allow additional properties
+};
+
+export type CartItem = {
+  item: CartClothingItem;
+  quantity: number;
+  size: string;
+  color: string;
+};
+
+export type Cart = {
+  _id: string;
+  user: string;
+  items: CartItem[];
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: any;
+};

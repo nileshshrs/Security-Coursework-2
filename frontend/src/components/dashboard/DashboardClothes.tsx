@@ -111,6 +111,7 @@ export default function DashboardClothes() {
                 <p className="text-sm font-semibold">{product.price}</p>
                 <div className="flex gap-2 mt-2">
                   <Button
+                    type="button"
                     size="sm"
                     className="flex-1 bg-black text-white hover:bg-neutral-800 border-none"
                     onClick={() => {
@@ -121,6 +122,7 @@ export default function DashboardClothes() {
                     Edit
                   </Button>
                   <Button
+                    type="button"
                     size="sm"
                     className="flex-1 bg-black text-white hover:bg-neutral-800 border-none"
                     onClick={() => {
@@ -185,6 +187,7 @@ export default function DashboardClothes() {
               <p className="text-sm font-semibold">{product.price}</p>
               <div className="flex gap-2 mt-2">
                 <Button
+                  type="button"
                   size="sm"
                   className="flex-1 bg-black text-white hover:bg-neutral-800 border-none"
                   onClick={() => {
@@ -195,6 +198,7 @@ export default function DashboardClothes() {
                   Edit
                 </Button>
                 <Button
+                  type="button"
                   size="sm"
                   className="flex-1 bg-black text-white hover:bg-neutral-800 border-none"
                   onClick={() => {
