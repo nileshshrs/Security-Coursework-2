@@ -1,29 +1,97 @@
 import React, { useState } from "react";
 import ProductSidebar from "@/components/Sidebar";
+import { useParams } from "react-router-dom";
+import { useGetClothesById } from "@/hooks/useClothes";
+import { Button } from "@/components/ui/button";
 
-const PRODUCT = {
-  name: "Crossover Short 7\"",
-  price: 48,
-  image: "https://raw.githubusercontent.com/nileshshrs/clothing-store/refs/heads/master/frontend/src/assets/PLUM_Sweetheart-Tank-3_768x_crop_center%402x.progressive.webp",
-  stapleColors: [
-    { label: "Black", value: "black" },
-    { label: "Infinity Blue", value: "infinity-blue" },
-    { label: "Slate", value: "slate" },
-  ],
-  sizes: ["S", "M", "L", "XL", "XXL"],
-  description:
-    "The perfect summer shorts for any adventure. Made from ripstop fabric, these shorts can handle both land and water activities, making them versatile and practical for any warm weather occasion. With their 7\" inseam, these shorts offer the perfect balance of coverage and mobility.",
-  materials: [
-    "Machine wash cold with like colors",
-    "Gentle Cycle",
-    "Tumble dry low",
-    "Low iron",
-  ],
-};
+// Always static
+const MATERIALS = [
+  "Machine wash cold with like colors",
+  "Gentle Cycle",
+  "Tumble dry low",
+  "Low iron",
+];
+
+// Helper for fallback, coloring, joining arrays, etc.
+function getProductImage(url?: string | null) {
+  if (
+    url &&
+    (url.toLowerCase().endsWith(".jpg") ||
+      url.toLowerCase().endsWith(".jpeg") ||
+      url.toLowerCase().endsWith(".png") ||
+      url.toLowerCase().endsWith(".webp") ||
+      url.startsWith("data:image"))
+  ) {
+    return url;
+  }
+  return "https://raw.githubusercontent.com/nileshshrs/clothing-store/refs/heads/master/frontend/src/assets/PLUM_Sweetheart-Tank-3_768x_crop_center%402x.progressive.webp";
+  ;
+}
+function getDisplayPrice(price: any): string {
+  if (price && typeof price === "object" && "$numberDecimal" in price)
+    return (
+      "₨ " +
+      Number(price.$numberDecimal).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  if (typeof price === "string" && !isNaN(Number(price)))
+    return (
+      "₨ " +
+      Number(price).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  if (typeof price === "number" && !isNaN(price))
+    return "₨ " + price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "—";
+}
+function joinVals(val: string[] | string) {
+  if (Array.isArray(val)) return val.join(", ");
+  return typeof val === "string" ? val : "";
+}
 
 export default function SingleProduct() {
-  const [selectedColor, setSelectedColor] = useState(PRODUCT.stapleColors[0].value);
-  const [selectedSize, setSelectedSize] = useState(PRODUCT.sizes[0]);
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading, isError } = useGetClothesById(id ?? "");
+  const product = data?.clothing;
+
+  // UI state
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
+
+  // Fallbacks
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <span className="text-gray-400 text-lg">Loading product...</span>
+      </div>
+    );
+  }
+  if (isError || !product) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <span className="text-red-500 text-lg">Product not found.</span>
+      </div>
+    );
+  }
+
+  // Parse color/size arrays and default selects
+  const colors: string[] = Array.isArray(product.color) ? product.color : typeof product.color === "string" ? product.color.split(",") : [];
+  const sizes: string[] = Array.isArray(product.size) ? product.size : typeof product.size === "string" ? product.size.split(",") : [];
+  const stapleColors = colors.map((color) => ({
+    label: color.charAt(0).toUpperCase() + color.slice(1),
+    value: color.toLowerCase(),
+  }));
+
+  // Set defaults on first render only
+  React.useEffect(() => {
+    if (!selectedColor && stapleColors.length > 0) setSelectedColor(stapleColors[0].value);
+    if (!selectedSize && sizes.length > 0) setSelectedSize(sizes[0]);
+    // eslint-disable-next-line
+  }, [product]);
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
@@ -38,8 +106,8 @@ export default function SingleProduct() {
         <div className="w-full md:w-[44%] flex justify-center items-start mb-8 md:mb-0">
           <div className="w-full max-w-[430px] h-[420px] md:h-[650px] bg-[#f8f6ff] flex items-center justify-center rounded">
             <img
-              src={PRODUCT.image}
-              alt={PRODUCT.name}
+              src={getProductImage(product.imagePath)}
+              alt={product.name}
               className="object-contain w-[85%] h-[85%] md:w-[90%] md:h-[92%]"
               draggable={false}
             />
@@ -49,25 +117,28 @@ export default function SingleProduct() {
         <div className="flex flex-col w-full max-w-[480px] mx-auto md:mx-0">
           {/* Title and Price */}
           <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
-            <h1 className="text-lg md:text-[22px] font-bold">{PRODUCT.name}</h1>
-            <span className="text-base md:text-[20px] font-semibold text-gray-700">${PRODUCT.price}</span>
+            <h1 className="text-lg md:text-[22px] font-bold">{product.name}</h1>
+            <span className="text-base md:text-[20px] font-semibold text-gray-700">{getDisplayPrice(product.price)}</span>
           </div>
           {/* Staple Colors */}
           <div className="mb-3 border-b border-gray-200 pb-3">
             <div className="flex justify-between items-center w-full mb-2">
               <span className="text-[14px] md:text-[15px] font-bold">Staple Colors:</span>
-              <span className="text-xs text-gray-600">{PRODUCT.stapleColors[0].label}</span>
+              <span className="text-xs text-gray-600">
+                {stapleColors.length ? stapleColors.find((c) => c.value === selectedColor)?.label : ""}
+              </span>
             </div>
             <div className="flex gap-2 flex-wrap">
-              {PRODUCT.stapleColors.map((color) => (
+              {stapleColors.map((color) => (
                 <button
                   key={color.value}
                   className={`px-3 py-1 border text-xs rounded transition-all duration-75
                     ${selectedColor === color.value
                       ? "bg-black text-white border-black"
                       : "border-gray-300 bg-white text-black"
-                  }`}
+                    }`}
                   onClick={() => setSelectedColor(color.value)}
+                  type="button"
                 >
                   {color.label}
                 </button>
@@ -81,15 +152,16 @@ export default function SingleProduct() {
               <span className="text-xs text-gray-600">{selectedSize}</span>
             </div>
             <div className="flex gap-2 flex-wrap">
-              {PRODUCT.sizes.map((size) => (
+              {sizes.map((size) => (
                 <button
                   key={size}
                   className={`w-10 h-9 border rounded transition-all duration-75
                     ${selectedSize === size
                       ? "bg-black text-white border-black"
                       : "bg-white text-black border-gray-300"
-                  } font-medium text-base`}
+                    } font-medium text-base`}
                   onClick={() => setSelectedSize(size)}
+                  type="button"
                 >
                   {size}
                 </button>
@@ -97,24 +169,34 @@ export default function SingleProduct() {
             </div>
           </div>
           {/* Add to Cart Button */}
-          <button
+          <Button
             className="w-full bg-black text-white py-3 rounded font-semibold text-base mt-2 mb-7 hover:bg-gray-800 transition"
             type="button"
           >
             Add to Cart
-          </button>
+          </Button>
           {/* Description */}
           <div className="mb-4 border-b border-gray-200 pb-3">
             <div className="font-semibold text-[14px] md:text-[15px] mb-1">Description</div>
-            <p className="text-gray-700 text-[14px] md:text-[15px] leading-relaxed">
-              {PRODUCT.description}
+            <p
+              className="text-gray-700 text-[14px] md:text-[15px] leading-relaxed"
+              style={{
+                minHeight: "5.8em", // ~4 lines @ 1.45em line-height
+                lineHeight: 1.45,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {product.description || "No description provided."}
             </p>
           </div>
           {/* Materials & Care */}
           <div>
             <div className="font-semibold text-[14px] md:text-[15px] mb-1">MATERIALS & CARE</div>
             <ul className="text-gray-700 text-sm list-disc pl-5 space-y-1">
-              {PRODUCT.materials.map((item) => (
+              {MATERIALS.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
