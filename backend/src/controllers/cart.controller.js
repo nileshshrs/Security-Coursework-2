@@ -35,9 +35,12 @@ export const updateCartController = catchErrors(async (req, res) => {
 
 export const removeCartItemController = catchErrors(async (req, res) => {
   const { itemID } = req.params;
+  const {size, color}   = req.body;
   const cart = await removeCartItem({
     userID: req.userID,
     itemID,
+    size,
+    color
   });
   await cart.populate("items.item");
   return res.status(OK).json({ message: "Item removed from cart", cart });

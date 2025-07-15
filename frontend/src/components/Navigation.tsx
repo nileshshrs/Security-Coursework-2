@@ -79,10 +79,13 @@ export default function Navigation() {
 
   // Handle item removal
   const handleRemove = (cartItem: CartItem) => {
-    removeItem.mutate(cartItem.item._id, {
-
+    removeItem.mutate({
+      itemID: cartItem.item._id,
+      size: cartItem.size,
+      color: cartItem.color,
     });
   };
+
 
   return (
     <nav

@@ -63,11 +63,19 @@ export const patchCartItem = async ({ userID, itemID, quantity, size, color }) =
     return cart;
 };
 
-export const removeCartItem = async ({ userID, itemID }) => {
-    const cart = await Cart.findOne({ user: userID });
-    appAssert(cart, NOT_FOUND, "Cart not found.");
+export const removeCartItem = async ({ userID, itemID, size, color }) => {
+  const cart = await Cart.findOne({ user: userID });
+  appAssert(cart, NOT_FOUND, "Cart not found.");
 
-    cart.items = cart.items.filter(i => i.item.toString() !== itemID);
-    await cart.save();
-    return cart;
+  cart.items = cart.items.filter(
+    i =>
+      !(
+        i.item.toString() === itemID &&
+        i.size === size &&
+        i.color === color
+      )
+  );
+
+  await cart.save();
+  return cart;
 };

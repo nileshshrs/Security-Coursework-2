@@ -164,9 +164,19 @@ export const updateCartItem = async ({
  * Remove item from cart
  * DELETE /api/cart/remove/:itemID
  */
-export const removeCartItem = async (itemID: string): Promise<any> => {
+export const removeCartItem = async ({
+  itemID,
+  size,
+  color,
+}: {
+  itemID: string;
+  size: string;
+  color: string;
+}): Promise<any> => {
   try {
-    const res = await API.delete(`/cart/remove/${itemID}`);
+    const res = await API.delete(`/cart/remove/${itemID}`, {
+      data: { size, color }
+    });
     return res; // returns { message, cart }
   } catch (error) {
     throw error;
