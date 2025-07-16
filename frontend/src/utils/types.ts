@@ -1,14 +1,13 @@
-export type User = {
-    _id: string;
-    email: string;
-    username: string;
-    role?: string;
-    image?: string;
-    bio?: string;
-    mfa?: boolean;
-    verified?: boolean
-    // Add more user fields here if you need
-};
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  image?: string;
+  bio?: string;
+  role: "user" | "admin";
+  verified: boolean;
+  mfaEnabled: boolean; // ✅ correct name
+}
 
 // --- Login Types ---
 export type LoginRequest = {

@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import MfaPage from "./pages/MfaPage";
 import CheckoutPage from "./pages/Checkout";
+import AccountPage from "./pages/Account";
 
 function App() {
   const location = useLocation();
@@ -40,6 +41,7 @@ function App() {
         <Route path="/account-recovery" element={<ForgotPassword />} />
         <Route path="/verify-mfa" element={<MfaPage />} />
         <Route path="/password/reset" element={<ResetPassword />} />
+        <Route path="/account" element={<AccountPage />} />
       </Routes>
     </>
   );

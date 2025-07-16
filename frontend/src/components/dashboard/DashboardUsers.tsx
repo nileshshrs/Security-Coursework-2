@@ -1,6 +1,5 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useUser } from "@/hooks/useUser";
-import React from "react";
 
 type User = {
   _id: string;

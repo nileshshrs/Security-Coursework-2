@@ -15,7 +15,7 @@ orderRoutes.get("/", authenticate, getUserOrdersController);
 orderRoutes.get("/all", authenticate, getAllOrdersController);
 
 // Cancel order (user only, must own order)
-orderRoutes.patch("cancel/:orderID", authenticate, cancelOrderController);
+orderRoutes.patch("/cancel/:orderID", authenticate, cancelOrderController);
 
 // Update order status (admin only, admin checked in controller)
 orderRoutes.put("/:orderID", authenticate, adminUpdateOrderStatusController);
