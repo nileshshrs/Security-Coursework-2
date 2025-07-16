@@ -15,6 +15,7 @@ import clothesRoutes from './routes/clothes.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import cartRoutes from './routes/cart.routes.js';
 import orderRoutes from './routes/order.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,6 +45,7 @@ app.use("/api/v1/clothes", clothesRoutes)
 app.use("/api/v1/cart", cartRoutes)
 app.use("/api/v1/order", orderRoutes)
 app.use("/api/v1/upload", uploadRoutes) 
+app.use("/api/v1/user", userRoutes)
 // Error handler
 app.use(error);
 

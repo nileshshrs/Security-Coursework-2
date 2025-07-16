@@ -271,3 +271,25 @@ export const updateOrderStatus = async ({
     throw error;
   }
 };
+
+
+
+// Get self (current user's profile)
+export const getSelf = async (): Promise<any> => {
+  return API.get("/user");
+};
+
+// Patch self (update profile, including password)
+export const patchSelf = async (updates: any): Promise<any> => {
+  return API.patch("/user", updates);
+};
+
+// Delete self (delete own account)
+export const deleteSelf = async (): Promise<any> => {
+  return API.delete("/user");
+};
+
+// Get all users (admin only)
+export const getAllUsers = async (): Promise<any> => {
+  return API.get("/user/all");
+};
