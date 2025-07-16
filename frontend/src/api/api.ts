@@ -182,3 +182,92 @@ export const removeCartItem = async ({
     throw error;
   }
 };
+
+
+// ORDER API
+
+/**
+ * Place an order from current user's cart
+ * POST /api/v1/order
+ */
+export const placeOrder = async ({
+  address,
+  paymentMethod,
+  khaltiToken,
+  khaltiAmount
+}: {
+  address: string;
+  paymentMethod: "cod" | "khalti";
+  khaltiToken?: string;
+  khaltiAmount?: number;
+}): Promise<any> => {
+  try {
+    const payload: any = { address, paymentMethod };
+    if (paymentMethod === "khalti") {
+      payload.khaltiToken = khaltiToken;
+      payload.khaltiAmount = khaltiAmount;
+    }
+    const res = await API.post("/order", payload);
+    return res; // { message, order }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get current user's orders
+ * GET /api/v1/order
+ */
+export const getUserOrders = async (): Promise<any> => {
+  try {
+    const res = await API.get("/order");
+    return res; // { orders }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get all orders (admin)
+ * GET /api/v1/order/all
+ */
+export const getAllOrders = async (): Promise<any> => {
+  try {
+    const res = await API.get("/order/all");
+    return res; // { orders }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Cancel an order (user)
+ * PATCH /api/v1/order/cancel/:orderID
+ */
+export const cancelOrder = async (orderID: string): Promise<any> => {
+  try {
+    const res = await API.patch(`/order/cancel/${orderID}`);
+    return res; // { message, order }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update order status (admin)
+ * PUT /api/v1/order/:orderID
+ */
+export const updateOrderStatus = async ({
+  orderID,
+  status,
+}: {
+  orderID: string;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+}): Promise<any> => {
+  try {
+    const res = await API.put(`/order/${orderID}`, { status });
+    return res; // { message, order }
+  } catch (error) {
+    throw error;
+  }
+};

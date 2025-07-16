@@ -20,7 +20,6 @@ export const addItemToCart = async ({ userID, itemID, quantity, size, color }) =
         BAD_REQUEST,
         "Invalid size."
     );
-
     appAssert(
         product.color.some((c) => c.toLowerCase() === color.toLowerCase()),
         BAD_REQUEST,
@@ -29,6 +28,7 @@ export const addItemToCart = async ({ userID, itemID, quantity, size, color }) =
 
     const cart = await getOrCreateCart(userID);
 
+    // Find using itemID + size + color
     const existing = cart.items.find(
         i => i.item.toString() === itemID && i.size === size && i.color === color
     );
@@ -43,26 +43,30 @@ export const addItemToCart = async ({ userID, itemID, quantity, size, color }) =
     return cart;
 };
 
-export const patchCartItem = async ({ userID, itemID, quantity, size, color }) => {
+// PATCH must use all 3 as identity
+export const patchCartItem = async ({ userID, itemID, size, color, quantity }) => {
     const cart = await Cart.findOne({ user: userID });
     appAssert(cart, NOT_FOUND, "Cart not found.");
 
-    const item = cart.items.find(i => i.item.toString() === itemID);
+    // Find using itemID + size + color
+    const item = cart.items.find(
+        i => i.item.toString() === itemID && i.size === size && i.color === color
+    );
     appAssert(item, NOT_FOUND, "Item not found in cart.");
 
-    // If size/color is being patched, validate with original Clothes item
+    // Validate against product
     const product = await Clothes.findById(itemID);
-    if (size) appAssert(product.size.includes(size), BAD_REQUEST, "Invalid size.");
-    if (color) appAssert(product.color.includes(color), BAD_REQUEST, "Invalid color.");
+    if (size) appAssert(product.size.some((s) => s.toLowerCase() === size.toLowerCase()), BAD_REQUEST, "Invalid size.");
+    if (color) appAssert(product.color.some((c) => c.toLowerCase() === color.toLowerCase()), BAD_REQUEST, "Invalid color.");
 
     if (quantity !== undefined) item.quantity = quantity;
-    if (size !== undefined) item.size = size;
-    if (color !== undefined) item.color = color;
+    // If you want to allow patching size/color to new values, handle here (optional)
 
     await cart.save();
     return cart;
 };
 
+// Remove must use all 3 as identity
 export const removeCartItem = async ({ userID, itemID, size, color }) => {
   const cart = await Cart.findOne({ user: userID });
   appAssert(cart, NOT_FOUND, "Cart not found.");

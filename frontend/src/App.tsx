@@ -13,6 +13,7 @@ import DashboardOrders from "./components/dashboard/DashboardOrders"; // <-- Imp
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import MfaPage from "./pages/MfaPage";
+import CheckoutPage from "./pages/Checkout";
 
 function App() {
   const location = useLocation();
@@ -33,6 +34,7 @@ function App() {
         </Route>
         <Route path="/clothes/:id" element={<SingleProduct />} />
         <Route path="/clothes/all" element={<ProductPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
         <Route path="/account-recovery" element={<ForgotPassword />} />

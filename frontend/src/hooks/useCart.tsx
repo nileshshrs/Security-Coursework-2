@@ -34,6 +34,7 @@ export const useCart = () => {
     data: cartData,
     isLoading: cartLoading,
     isError: cartError,
+    refetch, // ← add this here!
   } = useQuery<{ cart: Cart }>(
     {
       queryKey: CART_KEY,
@@ -65,5 +66,6 @@ export const useCart = () => {
     addItem,
     updateItem,
     removeItem,
+    refetch, // ← add this to the returned object!
   };
 };
