@@ -14,18 +14,29 @@ const UserDropdown = () => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Avatar
-          className="w-9 h-9 cursor-pointer shadow-[0_0_0_3px_rgba(0,0,0,0.06)] transition-shadow duration-200 hover:shadow-[0_0_0_4px_rgba(0,0,0,0.14)]"
-        >
-          <AvatarImage
-            src={user?.image}
-            alt="User"
-            className="aspect-square object-cover"
-          />
-          <AvatarFallback className="bg-black text-white text-sm uppercase font-bold">
-            {user ? user?.username[0] : "A"}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative w-9 h-9">
+          <Avatar
+            className="w-9 h-9 cursor-pointer shadow-[0_0_0_3px_rgba(0,0,0,0.06)] transition-shadow duration-200 hover:shadow-[0_0_0_4px_rgba(0,0,0,0.14)]"
+          >
+            <AvatarImage
+              src={user?.image}
+              alt="User"
+              className="aspect-square object-cover"
+            />
+            <AvatarFallback className="bg-black text-white text-sm uppercase font-bold">
+              {user ? user?.username[0] : "A"}
+            </AvatarFallback>
+          </Avatar>
+          {/* Exclamation badge if user is not verified */}
+          {user && user.verified === false && (
+            <span
+              className="absolute -top-1 -right-1 z-10 w-4 h-4 flex items-center justify-center rounded-full bg-yellow-400 border-2 border-white text-xs font-extrabold text-white shadow"
+              title="Account not verified"
+            >
+              !
+            </span>
+          )}
+        </div>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent

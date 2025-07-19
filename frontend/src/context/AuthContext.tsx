@@ -29,19 +29,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
   const [mfa, setMfa] = useState<MfaState | null>(null);
+  const [skipMismatchCheck, setSkipMismatchCheck] = useState(false);
+
+  const hasUserInStorage = !!localStorage.getItem("user");
+  const selfQuery = useQuery({
+    queryKey: ["user", "self"],
+    queryFn: getSelf,
+    enabled: hasUserInStorage,
+  });
+  const refetch = selfQuery.refetch;
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Use the same query as useUser, but not the hook itself (to avoid recursion)
-  const selfQuery = useQuery({
-    queryKey: ["user", "self"],
-    queryFn: getSelf,
-    enabled: !!user,
-  });
-  const refetch = selfQuery.refetch;
-
-  // LOGIN (may require MFA)
+  // LOGIN (with MFA support)
   const loginMutation = useMutation({
     mutationFn: async (data: LoginRequest) => {
       const res: any = await API.post("/auth/sign-in", data);
@@ -56,6 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
       setMfa(null);
+      setSkipMismatchCheck(true);
+      setTimeout(() => setSkipMismatchCheck(false), 1500); // <-- skip mismatch check for 1.5 seconds
     },
   });
 
@@ -69,6 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
       setMfa(null);
+      setSkipMismatchCheck(true);
+      setTimeout(() => setSkipMismatchCheck(false), 1500);
     },
   });
 
@@ -81,6 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     onSuccess: (res) => {
       setUser(res.user);
       localStorage.setItem("user", JSON.stringify(res.user));
+      setSkipMismatchCheck(true);
+      setTimeout(() => setSkipMismatchCheck(false), 1500);
     },
     onError: (error: any) => {
       console.error("Registration failed:", error);
@@ -115,8 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Storage/user mismatch logic
+  // Storage/user mismatch logic, skip when flag is true
   useEffect(() => {
+    if (skipMismatchCheck) return;
+
     function handleStorageChange(e: StorageEvent) {
       if (e.key === "user") {
         const storedUser = localStorage.getItem("user");
@@ -126,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const backendUser = result.data;
           const isEqual = deepEqual(backendUser, parsedStoredUser);
           if (!isEqual) {
-            logout();
+            // (optional) logout();
           }
         });
       }
@@ -136,6 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let prevUser = localStorage.getItem("user");
     const interval = setInterval(() => {
+      if (skipMismatchCheck) return;
       const currentUser = localStorage.getItem("user");
       if (currentUser !== prevUser) {
         const parsedStoredUser = currentUser ? JSON.parse(currentUser) : null;
@@ -155,7 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.removeEventListener("storage", handleStorageChange);
       clearInterval(interval);
     };
-  }, [refetch, logout]);
+  }, [refetch, logout, skipMismatchCheck]);
 
   const value: AuthContextType & {
     mfa: MfaState | null;

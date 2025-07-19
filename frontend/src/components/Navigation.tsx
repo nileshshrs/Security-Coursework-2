@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import type { Cart, CartItem } from "@/utils/types";
 
-
 const navItems = [
   { name: "Home", to: "/" },
   { name: "All", to: "/clothes/all" },
@@ -73,7 +72,6 @@ export default function Navigation() {
         size: cartItem.size,
         color: cartItem.color,
       },
-
     );
   };
 
@@ -85,7 +83,6 @@ export default function Navigation() {
       color: cartItem.color,
     });
   };
-
 
   return (
     <nav
@@ -190,129 +187,131 @@ export default function Navigation() {
             </Button>
           )}
 
-          {/* Cart Sheet */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="relative w-9 h-9 border-gray-300 hover:border-black"
-                aria-label="Shopping Bag"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-black"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
+          {/* Cart Sheet (show only if logged in) */}
+          {user && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative w-9 h-9 border-gray-300 hover:border-black"
+                  aria-label="Shopping Bag"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h13L17 13M7 13h10m-6 0v6"
-                  />
-                </svg>
-                <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                  {cart?.items?.length || 0}
-                </span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="pt-10 px-6 flex flex-col h-screen w-full lg:w-[60vw] xl:w-[40vw] md:w-[40vw] max-w-none"
-            >
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="mb-4 border-b pb-3">
-                  <h2 className="text-lg font-bold">Your Cart</h2>
-                </div>
-
-                <ScrollArea className="h-full pr-2">
-                  <div className="flex flex-col gap-5 pb-4">
-                    {cartLoading ? (
-                      <p className="text-gray-500 text-center py-10">Loading...</p>
-                    ) : cart?.items && cart.items.length > 0 ? (
-                      cart.items.map((cartItem: CartItem, idx: number) => (
-                        <div key={cartItem.item?._id || idx} className="flex items-center gap-4">
-                          <img
-                            src={cartItem.item?.imagePath}
-                            alt={cartItem.item?.name}
-                            className="w-16 h-16 object-cover rounded-md bg-gray-100"
-                            onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/64x64?text=No+Image"; }}
-                            draggable={false}
-                          />
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm truncate">{cartItem.item?.name}</p>
-                            <p className="text-xs text-gray-500">
-                              Size: {cartItem.size} | Color: {cartItem.color}
-                            </p>
-                            <div className="flex items-center mt-1 gap-2">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="w-7 h-7"
-                                disabled={cartItem.quantity <= 1 || updateItem.isPending}
-                                onClick={() =>
-                                  handleUpdateQuantity(cartItem, cartItem.quantity - 1)
-                                }
-                                aria-label="Decrease"
-                              >
-                                <Minus className="w-3 h-3" />
-                              </Button>
-                              <span className="text-base font-bold w-6 text-center select-none">{cartItem.quantity}</span>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="w-7 h-7"
-                                disabled={updateItem.isPending}
-                                onClick={() =>
-                                  handleUpdateQuantity(cartItem, cartItem.quantity + 1)
-                                }
-                                aria-label="Increase"
-                              >
-                                <Plus className="w-3 h-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-7 h-7 ml-2 text-red-600"
-                                onClick={() => handleRemove(cartItem)}
-                                disabled={removeItem.isPending}
-                                aria-label="Remove"
-                              >
-                                <Trash className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          <p className="font-semibold text-sm">
-                            {typeof cartItem.item?.price === "object" && cartItem.item.price.$numberDecimal
-                              ? "₨ " + Number(cartItem.item.price.$numberDecimal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                              : "₨ " + Number(cartItem.item?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-center py-10">Your cart is empty.</p>
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              <div className="mt-4 border-t pt-4 pb-6">
-                <div className="flex justify-between mb-4">
-                  <span className="text-sm font-medium text-gray-600">Subtotal</span>
-                  <span className="text-sm font-bold">
-                    ₨ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-black"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h13L17 13M7 13h10m-6 0v6"
+                    />
+                  </svg>
+                  <span className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                    {cart?.items?.length || 0}
                   </span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="pt-10 px-6 flex flex-col h-screen w-full lg:w-[60vw] xl:w-[40vw] md:w-[40vw] max-w-none"
+              >
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <div className="mb-4 border-b pb-3">
+                    <h2 className="text-lg font-bold">Your Cart</h2>
+                  </div>
+
+                  <ScrollArea className="h-full pr-2">
+                    <div className="flex flex-col gap-5 pb-4">
+                      {cartLoading ? (
+                        <p className="text-gray-500 text-center py-10">Loading...</p>
+                      ) : cart?.items && cart.items.length > 0 ? (
+                        cart.items.map((cartItem: CartItem, idx: number) => (
+                          <div key={cartItem.item?._id || idx} className="flex items-center gap-4">
+                            <img
+                              src={cartItem.item?.imagePath}
+                              alt={cartItem.item?.name}
+                              className="w-16 h-16 object-cover rounded-md bg-gray-100"
+                              onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/64x64?text=No+Image"; }}
+                              draggable={false}
+                            />
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm truncate">{cartItem.item?.name}</p>
+                              <p className="text-xs text-gray-500">
+                                Size: {cartItem.size} | Color: {cartItem.color}
+                              </p>
+                              <div className="flex items-center mt-1 gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="w-7 h-7"
+                                  disabled={cartItem.quantity <= 1 || updateItem.isPending}
+                                  onClick={() =>
+                                    handleUpdateQuantity(cartItem, cartItem.quantity - 1)
+                                  }
+                                  aria-label="Decrease"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </Button>
+                                <span className="text-base font-bold w-6 text-center select-none">{cartItem.quantity}</span>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="w-7 h-7"
+                                  disabled={updateItem.isPending}
+                                  onClick={() =>
+                                    handleUpdateQuantity(cartItem, cartItem.quantity + 1)
+                                  }
+                                  aria-label="Increase"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="w-7 h-7 ml-2 text-red-600"
+                                  onClick={() => handleRemove(cartItem)}
+                                  disabled={removeItem.isPending}
+                                  aria-label="Remove"
+                                >
+                                  <Trash className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <p className="font-semibold text-sm">
+                              {typeof cartItem.item?.price === "object" && cartItem.item.price.$numberDecimal
+                                ? "₨ " + Number(cartItem.item.price.$numberDecimal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : "₨ " + Number(cartItem.item?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-center py-10">Your cart is empty.</p>
+                      )}
+                    </div>
+                  </ScrollArea>
                 </div>
-                <Link to="/checkout">
-                  <Button className="w-full uppercase font-semibold text-sm">
-                    Checkout
-                  </Button>
-                </Link>
-              </div>
-            </SheetContent>
-          </Sheet>
+
+                <div className="mt-4 border-t pt-4 pb-6">
+                  <div className="flex justify-between mb-4">
+                    <span className="text-sm font-medium text-gray-600">Subtotal</span>
+                    <span className="text-sm font-bold">
+                      ₨ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <Link to="/checkout">
+                    <Button className="w-full uppercase font-semibold text-sm">
+                      Checkout
+                    </Button>
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
 
           {/* User Controls */}
           {user ? (

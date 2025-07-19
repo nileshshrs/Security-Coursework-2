@@ -3,8 +3,9 @@ import ProductSidebar from "@/components/Sidebar";
 import { useParams } from "react-router-dom";
 import { useGetClothesById } from "@/hooks/useClothes";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useCart } from "@/hooks/useCart"; // <-- use your cart hook
+import { toast, Toaster } from "sonner";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/context/AuthContext";
 
 const MATERIALS = [
   "Machine wash cold with like colors",
@@ -56,21 +57,22 @@ export default function SingleProduct() {
 
   const [selectedColor, setSelectedColor] = useState<string>();
   const [selectedSize, setSelectedSize] = useState<string>();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const colors = useMemo((): string[] => {
     return Array.isArray(product?.color)
       ? product.color
       : typeof product?.color === "string"
-      ? product.color.split(",")
-      : [];
+        ? product.color.split(",")
+        : [];
   }, [product]);
 
   const sizes = useMemo((): string[] => {
     return Array.isArray(product?.size)
       ? product.size
       : typeof product?.size === "string"
-      ? product.size.split(",")
-      : [];
+        ? product.size.split(",")
+        : [];
   }, [product]);
 
   const colorOptions = useMemo((): { label: string; value: string }[] => {
@@ -91,12 +93,31 @@ export default function SingleProduct() {
     }
   }, [product, selectedColor, selectedSize, colorOptions, sizes]);
 
-  // --- useCart global mutation ---
   const { addItem } = useCart();
+  const { user } = useAuth();
 
   const handleAddToCart = () => {
+    setErrorMsg(null);
+    if (!user) {
+      toast("Please log in to add items to cart.", {
+        style: {
+          background: "#fee2e2",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+        },
+        icon: "⛔"
+      });
+      return;
+    }
     if (!product?._id || !selectedColor || !selectedSize) {
-      toast.error("Select a color and size first.");
+      toast("Select a color and size first.", {
+        style: {
+          background: "#fee2e2",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+        },
+        icon: "⛔"
+      });
       return;
     }
     addItem.mutate(
@@ -107,8 +128,26 @@ export default function SingleProduct() {
         color: selectedColor,
       },
       {
-        onSuccess: () => toast.success("Added to cart!"),
-        onError: () => toast.error("Failed to add to cart."),
+        onSuccess: () => {
+          toast("Added to cart!", {
+            style: {
+              background: "#dcfce7",
+              color: "#166534",
+              border: "1px solid #bbf7d0",
+            },
+            icon: "✅"
+          });
+        },
+        onError: () => {
+          toast("Failed to add to cart.", {
+            style: {
+              background: "#fee2e2",
+              color: "#991b1b",
+              border: "1px solid #fca5a5",
+            },
+            icon: "⛔"
+          });
+        },
       }
     );
   };
@@ -134,8 +173,9 @@ export default function SingleProduct() {
       <div className="px-8 py-4">
         <ProductSidebar />
       </div>
+      {/* mobile */}
       <div className="flex-1 block lg:hidden">
-        <div className="flex flex-col gap-8 py-8 px-2 max-w-2xl  items-center justify-center">
+        <div className="flex flex-col gap-8 py-8 px-2 max-w-2xl items-center justify-center">
           <div className="w-full flex justify-center items-start mb-5">
             <div className="w-full max-w-[430px] h-[350px] bg-[#f8f6ff] flex items-center justify-center rounded">
               <img
@@ -200,13 +240,16 @@ export default function SingleProduct() {
               </div>
             </div>
             <Button
-              className="w-full bg-black text-white py-3 rounded font-semibold text-base mt-2 mb-7 hover:bg-gray-800 transition"
+              className="w-full bg-black text-white py-3 rounded font-semibold text-base mt-2 mb-2 hover:bg-gray-800 transition"
               type="button"
               onClick={handleAddToCart}
               disabled={addItem.isPending}
             >
               {addItem.isPending ? "Adding..." : "Add to Cart"}
             </Button>
+            {errorMsg && (
+              <div className="text-red-600 text-sm font-medium mb-2 text-center">{errorMsg}</div>
+            )}
             <div className="mb-4 border-b border-gray-200 pb-3">
               <div className="font-semibold text-[14px] mb-1">Description</div>
               <p
@@ -234,6 +277,7 @@ export default function SingleProduct() {
           </div>
         </div>
       </div>
+      {/* desktop */}
       <div className="hidden lg:flex-1 lg:block" style={{ containerType: "inline-size" }}>
         <div className="clothes-single-container grid grid-cols-1 gap-12 py-16 px-10 max-w-6xl w-full justify-items-center">
           <div className="flex justify-center items-start">
@@ -300,13 +344,16 @@ export default function SingleProduct() {
               </div>
             </div>
             <Button
-              className="w-full bg-black text-white py-3 rounded font-semibold text-base mt-2 mb-7 hover:bg-gray-800 transition"
+              className="w-full bg-black text-white py-3 rounded font-semibold text-base mt-2 mb-2 hover:bg-gray-800 transition"
               type="button"
               onClick={handleAddToCart}
               disabled={addItem.isPending}
             >
               {addItem.isPending ? "Adding..." : "Add to Cart"}
             </Button>
+            {errorMsg && (
+              <div className="text-red-600 text-sm font-medium mb-2 text-center">{errorMsg}</div>
+            )}
             <div className="mb-4 border-b border-gray-200 pb-3">
               <div className="font-semibold text-[15px] mb-1">Description</div>
               <p
@@ -345,6 +392,7 @@ export default function SingleProduct() {
           `}
         </style>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 }

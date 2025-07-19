@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import KhaltiCheckout from "khalti-checkout-web";
 import { useNavigate } from "react-router-dom";
-import { useOrder } from "@/hooks/useOrder"; // <-- Import your hook
+import { useOrder } from "@/hooks/useOrder";
+import { useAuth } from "@/context/AuthContext"; // <-- ADD THIS
 
 const publicTestKey = "test_public_key_402c2b0e98364222bb1c1ab02369cefd";
 
@@ -16,9 +17,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const khaltiCheckoutRef = useRef<any>(null);
   const navigate = useNavigate();
+  const { user } = useAuth(); // <-- GET USER
 
-
-  // Use the order hook
   const { placeOrder } = useOrder();
 
   const subtotal =
@@ -98,6 +98,10 @@ export default function CheckoutPage() {
     }
     if (!cart?.items?.length) {
       setError("Cart is empty.");
+      return;
+    }
+    if (!user?.verified) { // <--- ADD THIS CHECK
+      setError("You must verify your account to checkout.");
       return;
     }
     if (paymentMethod === "cod") {
@@ -199,12 +203,22 @@ export default function CheckoutPage() {
           </label>
         </div>
       </div>
+      {/* Show error message if not verified */}
+      {!user?.verified && (
+        <div className="mb-4 flex items-center gap-2 text-yellow-700 bg-yellow-100 border border-yellow-300 px-3 py-2 rounded text-sm font-semibold">
+          <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <circle cx="10" cy="10" r="10" />
+            <text x="10" y="15" textAnchor="middle" fontSize="14" fill="white" fontWeight="bold">!</text>
+          </svg>
+          Verify your account to checkout.
+        </div>
+      )}
       {error && (
         <div className="mb-4 text-red-500 text-sm">{error}</div>
       )}
       <Button
         className="w-full font-semibold"
-        disabled={checkingOut || !cart?.items?.length}
+        disabled={checkingOut || !cart?.items?.length || !user?.verified}
         onClick={handlePlaceOrder}
       >
         {checkingOut
