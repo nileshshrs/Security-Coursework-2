@@ -204,47 +204,91 @@ export default function AccountPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">My Orders</h2>
-        <ScrollArea className="rounded-2xl border bg-white shadow-md overflow-x-auto">
+      {/* Order History */}
+      {/* Order History */}
+      {/* Order History */}
+      <div className="mt-12 flex flex-col items-center">
+        <h2 className="text-2xl font-bold font-sans tracking-tight mb-6 text-gray-900 text-center">
+          Order History
+        </h2>
+        <ScrollArea className="rounded-2xl border bg-white shadow-sm overflow-x-auto w-full max-w-5xl">
           <div className="min-w-[900px]">
-            <div className="grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr_1fr] text-sm font-semibold bg-black text-white px-5 py-3 rounded-t-2xl">
-              <div>#</div>
-              <div>Name</div>
-              <div>Image</div>
-              <div>Qty</div>
-              <div>Total</div>
-              <div>Status</div>
+            {/* Table Header */}
+            <div className="grid grid-cols-[60px_72px_2.2fr_1fr_1fr_1.3fr] text-base font-bold font-sans tracking-wide bg-gray-900 text-white px-6 py-4 rounded-t-2xl">
+              <div className="text-center">#</div>
+              <div className="text-center">Image</div>
+              <div className="text-left">Product</div>
+              <div className="text-center">Quantity</div>
+              <div className="text-center">Total (₨)</div>
+              <div className="text-center">Status</div>
             </div>
 
             {flatOrderRows.length > 0 ? (
-              flatOrderRows.map((row:any) => (
+              flatOrderRows.map((row: any) => (
                 <div
                   key={row.key}
-                  className={`grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr_1fr] items-center px-5 py-3 border-b border-gray-200 ${row.rowClass}`}
+                  className={`grid grid-cols-[60px_72px_2.2fr_1fr_1fr_1.3fr] items-center px-6 py-4 border-b border-gray-100 ${row.rowClass
+                    }`}
+                  style={{
+                    fontFamily: "Inter, Montserrat, Helvetica Neue, Arial, sans-serif"
+                  }}
                 >
-                  <div>{row.index}</div>
-                  <div>{row.name}</div>
-                  <div>
+                  {/* # */}
+                  <div className="font-semibold text-gray-700 text-center">
+                    {row.index}
+                  </div>
+                  {/* Image */}
+                  <div className="flex justify-center">
                     <img
                       src={row.image}
                       alt="Product"
                       onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/48x48?text=No+Image";
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/48x48?text=No+Image";
                       }}
-                      className="w-12 h-12 object-cover rounded"
+                      className="w-12 h-12 object-cover rounded shadow"
+                      style={{
+                        border: "1.5px solid #e5e7eb",
+                        background: "#f9fafb"
+                      }}
                     />
                   </div>
-                  <div>{row.quantity}</div>
-                  <div>₨ {row.total}</div>
-                  <div className="flex items-center gap-2">
-                    <span>{row.status}</span>
+                  {/* Name (left aligned, bold) */}
+                  <div className="font-bold text-gray-800 text-left">{row.name}</div>
+                  {/* Quantity */}
+                  <div className="font-bold text-gray-800 text-center">
+                    {row.quantity}
+                  </div>
+                  {/* Total */}
+                  <div className="font-bold text-gray-900 text-center">
+                    ₨ {row.total}
+                  </div>
+                  {/* Status and Cancel button */}
+                  <div className="flex items-center gap-2 justify-center">
+                    <span
+                      className={`font-bold px-2 py-1 rounded text-center ${row.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : row.status === "delivered"
+                            ? "bg-green-100 text-green-800"
+                            : row.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                        }`}
+                      style={{ fontFamily: "inherit" }}
+                    >
+                      {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                    </span>
                     {row.status === "pending" && (
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleCancelOrder(row.orderId)}
                         disabled={cancelOrderMutation.isPending}
+                        className="font-semibold tracking-wide"
+                        style={{
+                          fontFamily: "inherit",
+                          letterSpacing: ".02em"
+                        }}
                       >
                         Cancel
                       </Button>
@@ -253,7 +297,9 @@ export default function AccountPage() {
                 </div>
               ))
             ) : (
-              <div className="text-center text-gray-500 py-8">No orders found.</div>
+              <div className="text-center text-gray-500 py-10 text-lg font-medium font-sans">
+                No orders found.
+              </div>
             )}
           </div>
           <ScrollBar orientation="horizontal" />

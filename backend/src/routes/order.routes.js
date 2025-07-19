@@ -1,6 +1,8 @@
 import express from "express";
 import { adminUpdateOrderStatusController, cancelOrderController, getAllOrdersController, getUserOrdersController, placeOrderController } from "../controllers/order.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import { validate } from "../middleware/validate.js";
+import { orderIDParamSchema, placeOrderSchema, updateOrderStatusSchema } from "../utils/schema.js";
 
 
 const orderRoutes = express.Router();

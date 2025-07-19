@@ -135,7 +135,7 @@ export default function SingleProduct() {
         <ProductSidebar />
       </div>
       <div className="flex-1 block lg:hidden">
-        <div className="flex flex-col gap-8 py-8 px-2 max-w-2xl mx-auto items-center justify-center">
+        <div className="flex flex-col gap-8 py-8 px-2 max-w-2xl  items-center justify-center">
           <div className="w-full flex justify-center items-start mb-5">
             <div className="w-full max-w-[430px] h-[350px] bg-[#f8f6ff] flex items-center justify-center rounded">
               <img
@@ -146,7 +146,7 @@ export default function SingleProduct() {
               />
             </div>
           </div>
-          <div className="flex flex-col w-full max-w-[480px] mx-auto">
+          <div className="flex flex-col w-full max-w-[480px]">
             <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
               <h1 className="text-lg font-bold">{product.name}</h1>
               <span className="text-base font-semibold text-gray-700">
@@ -235,7 +235,7 @@ export default function SingleProduct() {
         </div>
       </div>
       <div className="hidden lg:flex-1 lg:block" style={{ containerType: "inline-size" }}>
-        <div className="clothes-single-container grid grid-cols-1 gap-12 py-16 px-10 max-w-6xl mx-auto w-full justify-items-center">
+        <div className="clothes-single-container grid grid-cols-1 gap-12 py-16 px-10 max-w-6xl w-full justify-items-center">
           <div className="flex justify-center items-start">
             <div className="w-full max-w-[430px] h-[650px] bg-[#f8f6ff] flex items-center justify-center rounded">
               <img

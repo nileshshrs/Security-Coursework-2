@@ -15,6 +15,8 @@ import ResetPassword from "./pages/ResetPassword";
 import MfaPage from "./pages/MfaPage";
 import CheckoutPage from "./pages/Checkout";
 import AccountPage from "./pages/Account";
+import Mens from "./pages/Mens";
+import Womens from "./pages/Womens";
 
 function App() {
   const location = useLocation();
@@ -36,6 +38,8 @@ function App() {
         <Route path="/clothes/:id" element={<SingleProduct />} />
         <Route path="/clothes/all" element={<ProductPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/mens" element={<Mens />} />
+        <Route path="/womens" element={<Womens />} />
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
         <Route path="/account-recovery" element={<ForgotPassword />} />

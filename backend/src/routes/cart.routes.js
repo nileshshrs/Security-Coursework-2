@@ -7,6 +7,7 @@ import {
   removeCartItemController,
 } from "../controllers/cart.controller.js";
 import { validate } from "../middleware/validate.js"; // your standard validate middleware
+import { addToCartSchema, itemIDParamSchema, removeCartItemSchema, updateCartSchema } from "../utils/schema.js";
 
 
 const cartRoutes = Router();

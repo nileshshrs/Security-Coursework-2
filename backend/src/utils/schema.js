@@ -3,6 +3,9 @@ import Joi from "joi";
 // Disallow MongoDB-style injection attempts
 const mongoInjectionPattern = /^\s*\$[a-zA-Z0-9_]+/;
 
+// ObjectId Schema (for MongoDB IDs)
+const objectIdSchema = Joi.string().length(24).hex().required();
+
 const safeString = (fieldName) =>
   Joi.string()
     .custom((value, helpers) => {
@@ -49,7 +52,6 @@ export const mfaCodeSchema = Joi.object({
   code: Joi.string().length(6).pattern(/^\d+$/).required(),
 }).unknown(false);
 
-
 export const createClothesSchema = Joi.object({
   name: safeString("Name").trim().min(1).max(255).required(),
   category: Joi.string()
@@ -64,14 +66,13 @@ export const createClothesSchema = Joi.object({
     .items(safeString("Color").trim().min(1).max(30))
     .min(1)
     .required(),
-  price: Joi.number().greater(0).precision(2).required(), // price must be > 0
+  price: Joi.number().greater(0).precision(2).required(),
   inStock: Joi.boolean().optional(),
   bestseller: Joi.boolean().optional(),
   newArrival: Joi.boolean().optional(),
   imagePath: safeString("Image Path").trim().max(5000).optional().allow(""),
   description: safeString("Description").trim().max(10000).optional().allow(""),
-}).unknown(false); // Disallow extra fields
-
+}).unknown(false);
 
 export const updateClothesSchema = Joi.object({
   name: safeString("Name").trim().min(1).max(255).optional(),
@@ -89,36 +90,36 @@ export const updateClothesSchema = Joi.object({
   description: safeString("Description").trim().max(10000).optional().allow(""),
 }).min(1).unknown(false);
 
-//this is for clothing but it can be used in multiple places
 export const idParamSchema = Joi.object({
-  id: Joi.string().length(24).hex().required(),
+  id: objectIdSchema.label("ID"),
 });
 
 export const addToCartSchema = Joi.object({
   itemID: objectIdSchema.label("Item ID"),
   quantity: Joi.number().integer().min(1).default(1),
-  size: safeString("Size", 1, 20).required(),
-  color: safeString("Color", 1, 30).required(),
+  size: safeString("Size").min(1).max(20).required(),
+  color: safeString("Color").min(1).max(30).required(),
 }).unknown(false);
 
 export const updateCartSchema = Joi.object({
   itemID: objectIdSchema.label("Item ID"),
   quantity: Joi.number().integer().min(1).optional(),
-  size: safeString("Size", 1, 20).required(),
-  color: safeString("Color", 1, 30).required(),
+  size: safeString("Size").min(1).max(20).required(),
+  color: safeString("Color").min(1).max(30).required(),
 }).unknown(false);
 
 export const removeCartItemSchema = Joi.object({
-  size: safeString("Size", 1, 20).required(),
-  color: safeString("Color", 1, 30).required(),
+  size: safeString("Size").min(1).max(20).required(),
+  color: safeString("Color").min(1).max(30).required(),
 }).unknown(false);
 
 export const itemIDParamSchema = Joi.object({
-  itemID: objectIdSchema.label("Item ID")
+  itemID: objectIdSchema.label("Item ID"),
 });
 
 export const placeOrderSchema = Joi.object({
-  address: safeString("Address", 5, 500).required()
+  address: safeString("Address").min(5).max(500).required(),
+  paymentMethod: Joi.string().valid("khalti", "cod").required(), // allow only these two values
 }).unknown(false);
 
 export const orderIDParamSchema = Joi.object({
@@ -132,5 +133,5 @@ export const updateOrderStatusSchema = Joi.object({
     "shipped",
     "delivered",
     "cancelled"
-  ).required()
+  ).required(),
 }).unknown(false);

@@ -14,7 +14,7 @@ import type { Cart, CartItem } from "@/utils/types";
 
 const navItems = [
   { name: "Home", to: "/" },
-  { name: "All", to: "/all" },
+  { name: "All", to: "/clothes/all" },
   { name: "Men's", to: "/mens" },
   { name: "Women's", to: "/womens" },
 ];
@@ -73,7 +73,7 @@ export default function Navigation() {
         size: cartItem.size,
         color: cartItem.color,
       },
-    
+
     );
   };
 
@@ -120,8 +120,8 @@ export default function Navigation() {
                   <span>{item.name}</span>
                   <span
                     className={`block h-[2px] bg-black rounded-full mt-1 w-7 transition-transform duration-300 origin-center ${isActive
-                        ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
                       }`}
                   />
                 </span>
@@ -305,9 +305,11 @@ export default function Navigation() {
                     ₨ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-                <Button className="w-full uppercase font-semibold text-sm">
-                  Checkout
-                </Button>
+                <Link to="/checkout">
+                  <Button className="w-full uppercase font-semibold text-sm">
+                    Checkout
+                  </Button>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>
