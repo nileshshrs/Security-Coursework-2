@@ -93,3 +93,44 @@ export const updateClothesSchema = Joi.object({
 export const idParamSchema = Joi.object({
   id: Joi.string().length(24).hex().required(),
 });
+
+export const addToCartSchema = Joi.object({
+  itemID: objectIdSchema.label("Item ID"),
+  quantity: Joi.number().integer().min(1).default(1),
+  size: safeString("Size", 1, 20).required(),
+  color: safeString("Color", 1, 30).required(),
+}).unknown(false);
+
+export const updateCartSchema = Joi.object({
+  itemID: objectIdSchema.label("Item ID"),
+  quantity: Joi.number().integer().min(1).optional(),
+  size: safeString("Size", 1, 20).required(),
+  color: safeString("Color", 1, 30).required(),
+}).unknown(false);
+
+export const removeCartItemSchema = Joi.object({
+  size: safeString("Size", 1, 20).required(),
+  color: safeString("Color", 1, 30).required(),
+}).unknown(false);
+
+export const itemIDParamSchema = Joi.object({
+  itemID: objectIdSchema.label("Item ID")
+});
+
+export const placeOrderSchema = Joi.object({
+  address: safeString("Address", 5, 500).required()
+}).unknown(false);
+
+export const orderIDParamSchema = Joi.object({
+  orderID: objectIdSchema.label("Order ID"),
+});
+
+export const updateOrderStatusSchema = Joi.object({
+  status: Joi.string().valid(
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled"
+  ).required()
+}).unknown(false);

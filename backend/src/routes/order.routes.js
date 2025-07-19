@@ -6,8 +6,7 @@ import authenticate from "../middleware/authenticate.js";
 const orderRoutes = express.Router();
 
 // Place order (user)
-orderRoutes.post("/", authenticate, placeOrderController);
-
+orderRoutes.post("/", authenticate, validate(placeOrderSchema), placeOrderController);
 // Get all orders of current user
 orderRoutes.get("/", authenticate, getUserOrdersController);
 
@@ -15,9 +14,18 @@ orderRoutes.get("/", authenticate, getUserOrdersController);
 orderRoutes.get("/all", authenticate, getAllOrdersController);
 
 // Cancel order (user only, must own order)
-orderRoutes.patch("/cancel/:orderID", authenticate, cancelOrderController);
-
+orderRoutes.patch(
+    "/cancel/:orderID",
+    authenticate,
+    validate(orderIDParamSchema, "params"),
+    cancelOrderController
+);
 // Update order status (admin only, admin checked in controller)
-orderRoutes.put("/:orderID", authenticate, adminUpdateOrderStatusController);
-
+orderRoutes.put(
+    "/:orderID",
+    authenticate,
+    validate(orderIDParamSchema, "params"),
+    validate(updateOrderStatusSchema),
+    adminUpdateOrderStatusController
+);
 export default orderRoutes;
