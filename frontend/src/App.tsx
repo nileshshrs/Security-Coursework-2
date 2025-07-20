@@ -1,6 +1,5 @@
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import ProductPage from "./pages/Product";
@@ -18,6 +17,7 @@ import AccountPage from "./pages/Account";
 import Mens from "./pages/Mens";
 import Womens from "./pages/Womens";
 import { useAuth } from "./context/AuthContext";
+import Register from "./pages/Register";
 
 function App() {
   const location = useLocation();
@@ -26,45 +26,37 @@ function App() {
   // Hide Navigation if path starts with "/dashboard"
   const hideNav = location.pathname.startsWith("/dashboard");
 
-  // --- Route Guards ---
-  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!user) return <Navigate to="/sign-in" replace />;
-    return <>{children}</>;
-  };
-
-  const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!user || user.role !== "admin") return <Navigate to="/" replace />;
-    return <>{children}</>;
-  };
-
-  const GuestOnlyRoute = ({ children }: { children: React.ReactNode }) => {
-    if (user) return <Navigate to="/" replace />;
-    return <>{children}</>;
-  };
-
   return (
     <>
       {!hideNav && <Navigation />}
       <Routes>
+        {/* Public routes (no auth required) */}
         <Route path="/" element={<Home />} />
         <Route path="/clothes/:id" element={<SingleProduct />} />
         <Route path="/clothes/all" element={<ProductPage />} />
         <Route path="/mens" element={<Mens />} />
         <Route path="/womens" element={<Womens />} />
 
-        {/* Guest-only pages */}
-        <Route path="/sign-in" element={<GuestOnlyRoute><Login /></GuestOnlyRoute>} />
-        <Route path="/sign-up" element={<GuestOnlyRoute><Register /></GuestOnlyRoute>} />
-        <Route path="/account-recovery" element={<GuestOnlyRoute><ForgotPassword /></GuestOnlyRoute>} />
-        <Route path="/verify-mfa" element={<GuestOnlyRoute><MfaPage /></GuestOnlyRoute>} />
-        <Route path="/password/reset" element={<GuestOnlyRoute><ResetPassword /></GuestOnlyRoute>} />
+        {/* Guest-only routes */}
+        <Route path="/sign-in" element={user ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/sign-up" element={user ? <Navigate to="/" replace /> : <Register />} />
+        <Route path="/account-recovery" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
+        <Route path="/verify-mfa" element={user ? <Navigate to="/" replace /> : <MfaPage />} />
+        <Route path="/password/reset" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
 
-        {/* Authenticated user pages */}
-        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-        <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+        {/* Protected user routes */}
+        <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/sign-in" replace />} />
+        <Route path="/account" element={user ? <AccountPage /> : <Navigate to="/sign-in" replace />} />
 
         {/* Admin-only dashboard */}
-        <Route path="/dashboard/*" element={<AdminRoute><Dashboard /></AdminRoute>}>
+        <Route
+          path="/dashboard/*"
+          element={
+            user && user.role === "admin"
+              ? <Dashboard />
+              : <Navigate to="/" replace />
+          }
+        >
           <Route index element={<DashboardOverview />} />
           <Route path="clothes" element={<DashboardClothes />} />
           <Route path="users" element={<DashboardUsers />} />
