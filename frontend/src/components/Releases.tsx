@@ -89,7 +89,7 @@ export default function Releases() {
             </TabsList>
           </div>
           <Button variant="default" className="text-sm px-5 py-2 font-mono font-semibold" asChild>
-            <Link to="/clothes">Shop All</Link>
+            <Link to="/clothes/all">Shop All</Link>
           </Button>
         </div>
 

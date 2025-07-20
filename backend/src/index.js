@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
 import https from 'https';
+import helmet from 'helmet';
 import { PORT } from './utils/constants/env.js';
 import connect from './database/connect.js';
 import error from './middleware/error.js';
@@ -16,6 +17,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import cartRoutes from './routes/cart.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import userRoutes from './routes/user.routes.js';
+import { generalLimiter } from './middleware/ratelimiter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,6 +31,14 @@ const sslOptions = {
 // Create Express app
 const app = express();
 
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    hsts: false, // HSTS not needed on localhost
+  })
+);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -40,6 +50,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+app.use(generalLimiter);
 app.use("/api/v1/auth", authRoutes)
 app.use("/api/v1/clothes", clothesRoutes)
 app.use("/api/v1/cart", cartRoutes)

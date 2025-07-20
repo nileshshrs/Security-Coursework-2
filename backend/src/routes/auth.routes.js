@@ -20,17 +20,18 @@ import {
   refreshTokenSchema,
   mfaCodeSchema,
 } from "../utils/schema.js";
+import { authLimiter } from "../middleware/ratelimiter.js";
 
 const authRoutes = Router();
 
 authRoutes.post("/sign-up", validate(registerSchema), registerController);
-authRoutes.post("/sign-in", validate(loginSchema), loginController);
+authRoutes.post("/sign-in", authLimiter, validate(loginSchema), loginController);
 authRoutes.get("/logout", logoutController);
 authRoutes.post("/refresh", validate(refreshTokenSchema), refreshController);
-authRoutes.post("/account-recovery", validate(sendPasswordResetSchema), sendPasswordResetController);
+authRoutes.post("/account-recovery", authLimiter, validate(sendPasswordResetSchema), sendPasswordResetController);
 authRoutes.post("/reset-password", validate(passwordResetSchema), resetPasswordController);
 authRoutes.get("/verify-email/:code", validate(verifyEmailSchema, "params"), verifyEmailController);
-authRoutes.post("/verify-mfa", validate(mfaCodeSchema), verifyMfaController);
+authRoutes.post("/verify-mfa",authLimiter, validate(mfaCodeSchema), verifyMfaController);
 
 
 export default authRoutes;
