@@ -10,11 +10,11 @@ export const validate = (schema, source = "body") => (req, res, next) => {
       const message = error.details
         .map((d) => d.message.replace(/["]/g, "")) // Clean output
         .join(", ");
-      return next(new AppError(`Validation failed: ${message}`, BAD_REQUEST));
+      return next(new AppError(BAD_REQUEST, `Validation failed: ${message}`, "VALIDATION_ERROR"));
     }
 
     next();
   } catch (err) {
-    next(new AppError("Server error during validation", BAD_REQUEST));
+    next(new AppError(BAD_REQUEST, "Server error during validation", "VALIDATION_INTERNAL"));
   }
 };
