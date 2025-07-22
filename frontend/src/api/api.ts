@@ -293,3 +293,14 @@ export const deleteSelf = async (): Promise<any> => {
 export const getAllUsers = async (): Promise<any> => {
   return API.get("/user/all");
 };
+
+
+// src/api/auth.ts
+export const verifyEmail = async (code: string): Promise<any> => {
+  try {
+    const res = await API.post(`/auth/verify-email/${code}`);
+    return res; // { message: "Email verification successful." }
+  } catch (error) {
+    throw error;
+  }
+};

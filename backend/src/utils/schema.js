@@ -1,4 +1,5 @@
 import Joi from "joi";
+import mongoSanitize from "mongo-sanitize";
 
 // Disallow MongoDB-style injection attempts
 const mongoInjectionPattern = /^\s*\$[a-zA-Z0-9_]+/;
@@ -6,17 +7,32 @@ const mongoInjectionPattern = /^\s*\$[a-zA-Z0-9_]+/;
 // ObjectId Schema (for MongoDB IDs)
 const objectIdSchema = Joi.string().length(24).hex().required();
 
+
 const safeString = (fieldName) =>
   Joi.string()
     .custom((value, helpers) => {
-      if (typeof value !== "string" || mongoInjectionPattern.test(value)) {
+      if (typeof value !== "string") {
+        return helpers.message(`${fieldName} must be a string.`);
+      }
+
+      // Sanitize input to remove any $ or . keys
+      const sanitized = mongoSanitize(value);
+
+      if (mongoInjectionPattern.test(sanitized)) {
         return helpers.message(`${fieldName} contains potentially dangerous input.`);
       }
-      return value;
+
+      // Optionally, reject if sanitized value differs (means suspicious input)
+      if (sanitized !== value) {
+        return helpers.message(`${fieldName} contains forbidden characters.`);
+      }
+
+      return sanitized;
     })
     .messages({
       "string.base": `${fieldName} must be a string.`,
     });
+
 
 export const registerSchema = Joi.object({
   email: Joi.string().email().trim().required(),

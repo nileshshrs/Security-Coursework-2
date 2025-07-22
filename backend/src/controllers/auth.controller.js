@@ -112,7 +112,6 @@ export const verifyEmailController = catchErrors(
     async (req, res) => {
         const verificationCode = req.params.code;
         await verifyEmail(verificationCode);
-
         return res.status(OK).json({
             message: "Email verification successful."
         });

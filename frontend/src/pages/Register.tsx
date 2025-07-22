@@ -18,12 +18,24 @@ const registerSchema = z.object({
     .string()
     .min(4, "Username must be at least 4 characters")
     .max(64, "Username must be at most 64 characters")
-    .regex(USER_REGEX, "Username can only contain letters, numbers, - or _"),
-  email: z.string().regex(EMAIL_REGEX, "Invalid email address"),
+    .regex(USER_REGEX, "Username can only contain letters, numbers, - or _")
+    .refine(
+      (val) => !/[<>$={}]/.test(val) && !val.toLowerCase().includes("script"),// < {}
+      {
+        message: "Username contains potentially dangerous input",
+      }
+    ),
+  email: z
+    .string()
+    .regex(EMAIL_REGEX, "Invalid email address")
+    .refine((val) => !/[<>$={}]/.test(val) && !val.toLowerCase().includes("script"), {
+      message: "Email contains potentially dangerous input",
+    }),
   password: z
     .string()
     .regex(PWD_REGEX, "Password must be 8-24 chars, with uppercase, lowercase, and a number"),
 });
+
 
 type RegisterValues = z.infer<typeof registerSchema>;
 

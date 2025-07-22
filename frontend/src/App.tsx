@@ -16,8 +16,9 @@ import CheckoutPage from "./pages/Checkout";
 import AccountPage from "./pages/Account";
 import Mens from "./pages/Mens";
 import Womens from "./pages/Womens";
-import { useAuth } from "./context/AuthContext";
 import Register from "./pages/Register";
+import { useAuth } from "./context/AuthContext";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
         <Route path="/clothes/all" element={<ProductPage />} />
         <Route path="/mens" element={<Mens />} />
         <Route path="/womens" element={<Womens />} />
+        <Route path="/email-verification/:code" element={<VerifyEmailPage />} /> {/* ✅ NEW ROUTE */}
 
         {/* Guest-only routes */}
         <Route path="/sign-in" element={user ? <Navigate to="/" replace /> : <Login />} />

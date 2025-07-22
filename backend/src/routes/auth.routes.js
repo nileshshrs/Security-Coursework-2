@@ -30,7 +30,7 @@ authRoutes.get("/logout", logoutController);
 authRoutes.post("/refresh", validate(refreshTokenSchema), refreshController);
 authRoutes.post("/account-recovery", authLimiter, validate(sendPasswordResetSchema), sendPasswordResetController);
 authRoutes.post("/reset-password", validate(passwordResetSchema), resetPasswordController);
-authRoutes.get("/verify-email/:code", validate(verifyEmailSchema, "params"), verifyEmailController);
+authRoutes.post("/verify-email/:code", validate(verifyEmailSchema, "params"), verifyEmailController);
 authRoutes.post("/verify-mfa",authLimiter, validate(mfaCodeSchema), verifyMfaController);
 
 

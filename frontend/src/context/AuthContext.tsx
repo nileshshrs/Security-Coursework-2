@@ -80,11 +80,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // REGISTER
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; username: string; password: string }) => {
-      const res = await API.post("/auth/sign-up", data) as { data: { user: User; message: string } };
-      return res.data;
+      const res = await API.post("/auth/sign-up", data) as { user: User; message: string };
+      console.log(res)
+      return res;
     },
     onSuccess: (res) => {
-      setUser(res.user);
+      setUser(res?.user);
       localStorage.setItem("user", JSON.stringify(res.user));
       setSkipMismatchCheck(true);
       setTimeout(() => setSkipMismatchCheck(false), 1500);
@@ -135,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const backendUser = result.data;
           const isEqual = deepEqual(backendUser, parsedStoredUser);
           if (!isEqual) {
-            // (optional) logout();
+            logout();
           }
         });
       }
